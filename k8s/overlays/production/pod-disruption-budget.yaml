@@ -1,0 +1,55 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: faq-backend-pdb
+  labels:
+    app: faq-backend
+    environment: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: faq-backend
+      environment: production
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: faq-frontend-pdb
+  labels:
+    app: faq-frontend
+    environment: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: faq-frontend
+      environment: production
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: postgres-pdb
+  labels:
+    app: postgres
+    environment: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: postgres
+      environment: production
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: redis-pdb
+  labels:
+    app: redis
+    environment: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: redis
+      environment: production

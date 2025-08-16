@@ -1,0 +1,65 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - backend-deployment.yaml
+  - frontend-deployment.yaml
+  - postgres-deployment.yaml
+  - redis-deployment.yaml
+  - secrets.yaml
+
+commonLabels:
+  app.kubernetes.io/name: faq-system
+  app.kubernetes.io/part-of: faq-platform
+  app.kubernetes.io/managed-by: kustomize
+
+commonAnnotations:
+  app.kubernetes.io/version: "1.0.0"
+  contact: "faq-team@your-domain.com"
+
+images:
+  - name: faq-backend
+    newName: your-registry.com/faq-system/backend
+    newTag: latest
+  - name: faq-frontend
+    newName: your-registry.com/faq-system/frontend
+    newTag: latest
+  - name: postgres
+    newName: postgres
+    newTag: 15-alpine
+  - name: redis
+    newName: redis
+    newTag: 7-alpine
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - SPRING_PROFILES_ACTIVE=default
+      - LOG_LEVEL=INFO
+      - DATABASE_NAME=faq
+      - REDIS_DATABASE=0
+      - JWT_EXPIRATION=3600
+      - CACHE_TTL=300
+      - API_RATE_LIMIT=1000
+      - CORS_ALLOWED_ORIGINS=*
+      - PAGINATION_DEFAULT_SIZE=20
+      - PAGINATION_MAX_SIZE=100
+      - MONITORING_ENABLED=false
+
+secretGenerator:
+  - name: app-secrets
+    literals:
+      - DATABASE_PASSWORD=default_password_change_me
+      - REDIS_PASSWORD=default_redis_password_change_me
+      - JWT_SECRET=default_jwt_secret_change_me_long_secret_key
+
+replicas:
+  - name: faq-backend
+    count: 1
+  - name: faq-frontend
+    count: 1
+  - name: postgres
+    count: 1
+  - name: redis
+    count: 1

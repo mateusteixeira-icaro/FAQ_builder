@@ -1,0 +1,170 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+      - name: postgres
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        env:
+        - name: POSTGRES_DB
+          value: "faq_production"
+        - name: POSTGRES_MAX_CONNECTIONS
+          value: "200"
+        - name: POSTGRES_SHARED_BUFFERS
+          value: "512MB"
+        - name: POSTGRES_EFFECTIVE_CACHE_SIZE
+          value: "1GB"
+        - name: POSTGRES_WORK_MEM
+          value: "8MB"
+        - name: POSTGRES_MAINTENANCE_WORK_MEM
+          value: "256MB"
+        - name: POSTGRES_CHECKPOINT_COMPLETION_TARGET
+          value: "0.9"
+        - name: POSTGRES_WAL_BUFFERS
+          value: "16MB"
+        - name: POSTGRES_DEFAULT_STATISTICS_TARGET
+          value: "100"
+        - name: POSTGRES_RANDOM_PAGE_COST
+          value: "1.1"
+        - name: POSTGRES_EFFECTIVE_IO_CONCURRENCY
+          value: "200"
+        - name: POSTGRES_LOG_STATEMENT
+          value: "none"
+        - name: POSTGRES_LOG_MIN_DURATION_STATEMENT
+          value: "5000"
+        - name: POSTGRES_LOG_CHECKPOINTS
+          value: "on"
+        - name: POSTGRES_LOG_CONNECTIONS
+          value: "on"
+        - name: POSTGRES_LOG_DISCONNECTIONS
+          value: "on"
+        - name: POSTGRES_LOG_LOCK_WAITS
+          value: "on"
+        - name: POSTGRES_LOG_TEMP_FILES
+          value: "0"
+        - name: POSTGRES_TRACK_ACTIVITIES
+          value: "on"
+        - name: POSTGRES_TRACK_COUNTS
+          value: "on"
+        - name: POSTGRES_TRACK_IO_TIMING
+          value: "on"
+        - name: POSTGRES_TRACK_FUNCTIONS
+          value: "pl"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 999
+          fsGroup: 999
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: postgres-config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        - name: postgres-init
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: postgres-config
+        configMap:
+          name: postgres-config
+      - name: postgres-init
+        configMap:
+          name: postgres-init-scripts
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: gp2
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+data:
+  postgresql.conf: |
+    # Connection settings
+    listen_addresses = '*'
+    port = 5432
+    max_connections = 200
+    
+    # Memory settings
+    shared_buffers = 512MB
+    effective_cache_size = 1GB
+    work_mem = 8MB
+    maintenance_work_mem = 256MB
+    
+    # Checkpoint settings
+    checkpoint_completion_target = 0.9
+    wal_buffers = 16MB
+    
+    # Query planner settings
+    default_statistics_target = 100
+    random_page_cost = 1.1
+    effective_io_concurrency = 200
+    
+    # Logging settings
+    log_destination = 'stderr'
+    logging_collector = on
+    log_directory = 'log'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_rotation_age = 1d
+    log_rotation_size = 100MB
+    log_min_duration_statement = 5000
+    log_checkpoints = on
+    log_connections = on
+    log_disconnections = on
+    log_lock_waits = on
+    log_temp_files = 0
+    
+    # Statistics settings
+    track_activities = on
+    track_counts = on
+    track_io_timing = on
+    track_functions = pl

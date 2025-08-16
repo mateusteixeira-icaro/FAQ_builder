@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: faq-system
+  labels:
+    name: faq-system
+    app.kubernetes.io/name: faq-system
+    app.kubernetes.io/part-of: faq-platform
+    app.kubernetes.io/managed-by: kustomize
+    environment: default
+  annotations:
+    description: "FAQ System namespace for all FAQ application components"
+    contact: "faq-team@your-domain.com"
+    documentation: "https://wiki.company.com/faq-system"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: faq-system-quota
+  namespace: faq-system
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "10"
+    pods: "20"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: faq-system-limits
+  namespace: faq-system
+spec:
+  limits:
+  - default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Container
+  - max:
+      cpu: "2"
+      memory: "4Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    type: Container
+  - max:
+      storage: "100Gi"
+    min:
+      storage: "1Gi"
+    type: PersistentVolumeClaim

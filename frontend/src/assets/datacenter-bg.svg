@@ -1,0 +1,64 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a23;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a1a3a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f0f2a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="serverGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#ff00ff;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#ffff00;stop-opacity:0.1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGradient)"/>
+  
+  <!-- Server racks -->
+  <g opacity="0.8">
+    <!-- Left server rack -->
+    <rect x="100" y="200" width="80" height="600" fill="#1a1a2e" stroke="#00ffff" stroke-width="2" rx="4"/>
+    <rect x="110" y="220" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="110" y="250" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="110" y="280" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="110" y="310" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    
+    <!-- Center server rack -->
+    <rect x="300" y="150" width="80" height="700" fill="#1a1a2e" stroke="#ff00ff" stroke-width="2" rx="4"/>
+    <rect x="310" y="170" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="310" y="200" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="310" y="230" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="310" y="260" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    
+    <!-- Right server rack -->
+    <rect x="500" y="180" width="80" height="650" fill="#1a1a2e" stroke="#ffff00" stroke-width="2" rx="4"/>
+    <rect x="510" y="200" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="510" y="230" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="510" y="260" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+    <rect x="510" y="290" width="60" height="20" fill="url(#serverGlow)" rx="2"/>
+  </g>
+  
+  <!-- Neon lights on ceiling -->
+  <g opacity="0.6">
+    <line x1="0" y1="50" x2="1920" y2="50" stroke="#ff00ff" stroke-width="4" opacity="0.8"/>
+    <line x1="0" y1="100" x2="1920" y2="100" stroke="#00ffff" stroke-width="4" opacity="0.8"/>
+    <line x1="0" y1="150" x2="1920" y2="150" stroke="#ffff00" stroke-width="4" opacity="0.8"/>
+  </g>
+  
+  <!-- Floor reflection -->
+  <rect x="0" y="900" width="1920" height="180" fill="url(#bgGradient)" opacity="0.3"/>
+  
+  <!-- Ambient particles -->
+  <g opacity="0.4">
+    <circle cx="200" cy="300" r="2" fill="#00ffff">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="400" cy="250" r="2" fill="#ff00ff">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="600" cy="350" r="2" fill="#ffff00">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

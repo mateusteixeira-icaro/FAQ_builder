@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: postgres
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: POSTGRES_DB
+          value: "faq_staging"
+        - name: POSTGRES_MAX_CONNECTIONS
+          value: "100"
+        - name: POSTGRES_SHARED_BUFFERS
+          value: "128MB"
+        - name: POSTGRES_EFFECTIVE_CACHE_SIZE
+          value: "256MB"
+        - name: POSTGRES_WORK_MEM
+          value: "4MB"
+        - name: POSTGRES_MAINTENANCE_WORK_MEM
+          value: "64MB"
+        - name: POSTGRES_LOG_STATEMENT
+          value: "all"
+        - name: POSTGRES_LOG_MIN_DURATION_STATEMENT
+          value: "1000"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard

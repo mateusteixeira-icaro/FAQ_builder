@@ -1,0 +1,96 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: faq-staging
+
+resources:
+  - ../../base
+
+replicas:
+  - name: faq-backend
+    count: 2
+  - name: faq-frontend
+    count: 2
+  - name: postgres
+    count: 1
+  - name: redis
+    count: 1
+
+images:
+  - name: faq-backend
+    newTag: latest
+  - name: faq-frontend
+    newTag: latest
+  - name: postgres
+    newTag: 15-alpine
+  - name: redis
+    newTag: 7-alpine
+
+patchesStrategicMerge:
+  - backend-staging-patch.yaml
+  - frontend-staging-patch.yaml
+  - postgres-staging-patch.yaml
+  - redis-staging-patch.yaml
+
+configMapGenerator:
+  - name: app-config
+    behavior: merge
+    literals:
+      - SPRING_PROFILES_ACTIVE=staging
+      - LOG_LEVEL=DEBUG
+      - CORS_ALLOWED_ORIGINS=https://faq-staging.your-domain.com
+      - DATABASE_NAME=faq_staging
+      - REDIS_DATABASE=1
+      - JWT_EXPIRATION=3600
+      - CACHE_TTL=300
+      - API_RATE_LIMIT=1000
+      - MONITORING_ENABLED=true
+
+secretGenerator:
+  - name: app-secrets
+    behavior: merge
+    literals:
+      - DATABASE_PASSWORD=staging_password_change_me
+      - REDIS_PASSWORD=staging_redis_password_change_me
+      - JWT_SECRET=staging_jwt_secret_change_me_very_long_secret_key
+
+commonLabels:
+  environment: staging
+  version: v1.0.0
+  team: faq-development
+
+commonAnnotations:
+  deployment.kubernetes.io/revision: "1"
+  argocd.argoproj.io/sync-wave: "1"
+
+namePrefix: staging-
+
+patches:
+  - target:
+      kind: Ingress
+      name: faq-ingress
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: faq-staging.your-domain.com
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: faq-staging.your-domain.com
+  - target:
+      kind: Deployment
+      name: faq-backend
+    patch: |
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: ENVIRONMENT
+          value: staging
+  - target:
+      kind: Deployment
+      name: faq-frontend
+    patch: |
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: REACT_APP_ENVIRONMENT
+          value: staging

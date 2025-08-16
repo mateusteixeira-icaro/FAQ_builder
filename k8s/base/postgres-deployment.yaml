@@ -1,0 +1,186 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: faq-system
+  labels:
+    app: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: faq-system
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: database
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: init-script
+        configMap:
+          name: postgres-init-script
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: faq-system
+  labels:
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+  namespace: faq-system
+data:
+  init.sql: |
+    -- Create extensions if needed
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    
+    -- Create indexes for better performance
+    CREATE INDEX IF NOT EXISTS idx_categories_active ON categories(active);
+    CREATE INDEX IF NOT EXISTS idx_categories_display_order ON categories(display_order);
+    CREATE INDEX IF NOT EXISTS idx_faqs_active ON faqs(active);
+    CREATE INDEX IF NOT EXISTS idx_faqs_category_id ON faqs(category_id);
+    CREATE INDEX IF NOT EXISTS idx_faqs_priority ON faqs(priority);
+    CREATE INDEX IF NOT EXISTS idx_faqs_display_order ON faqs(display_order);
+    CREATE INDEX IF NOT EXISTS idx_faqs_view_count ON faqs(view_count);
+    CREATE INDEX IF NOT EXISTS idx_faqs_helpful_count ON faqs(helpful_count);
+    CREATE INDEX IF NOT EXISTS idx_faqs_created_at ON faqs(created_at);
+    
+    -- Full text search indexes
+    CREATE INDEX IF NOT EXISTS idx_faqs_question_fts ON faqs USING gin(to_tsvector('portuguese', question));
+    CREATE INDEX IF NOT EXISTS idx_faqs_answer_fts ON faqs USING gin(to_tsvector('portuguese', answer));
+    CREATE INDEX IF NOT EXISTS idx_faqs_tags_fts ON faqs USING gin(to_tsvector('portuguese', tags));
+    
+    -- Insert sample data if tables are empty
+    INSERT INTO categories (name, description, display_order, active, created_at, updated_at)
+    SELECT 'Geral', 'Perguntas gerais sobre o sistema', 1, true, NOW(), NOW()
+    WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Geral');
+    
+    INSERT INTO categories (name, description, display_order, active, created_at, updated_at)
+    SELECT 'Suporte Técnico', 'Questões relacionadas ao suporte técnico', 2, true, NOW(), NOW()
+    WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Suporte Técnico');
+    
+    -- Insert sample FAQs
+    INSERT INTO faqs (question, answer, category_id, tags, priority, active, display_order, view_count, helpful_count, not_helpful_count, created_at, updated_at, created_by, updated_by)
+    SELECT 
+        'Como posso entrar em contato com o suporte?',
+        'Você pode entrar em contato conosco através do email suporte@empresa.com ou pelo telefone (11) 1234-5678.',
+        (SELECT id FROM categories WHERE name = 'Suporte Técnico' LIMIT 1),
+        'contato, suporte, email, telefone',
+        1,
+        true,
+        1,
+        0,
+        0,
+        0,
+        NOW(),
+        NOW(),
+        'system',
+        'system'
+    WHERE NOT EXISTS (SELECT 1 FROM faqs WHERE question = 'Como posso entrar em contato com o suporte?');
+    
+    INSERT INTO faqs (question, answer, category_id, tags, priority, active, display_order, view_count, helpful_count, not_helpful_count, created_at, updated_at, created_by, updated_by)
+    SELECT 
+        'Qual é o horário de funcionamento?',
+        'Nosso horário de funcionamento é de segunda a sexta-feira, das 8h às 18h.',
+        (SELECT id FROM categories WHERE name = 'Geral' LIMIT 1),
+        'horário, funcionamento, atendimento',
+        2,
+        true,
+        1,
+        0,
+        0,
+        0,
+        NOW(),
+        NOW(),
+        'system',
+        'system'
+    WHERE NOT EXISTS (SELECT 1 FROM faqs WHERE question = 'Qual é o horário de funcionamento?');

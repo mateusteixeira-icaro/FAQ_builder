@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronRight, faSearchPlus } from '@fortawesome/free-solid-svg-icons';
 import { Card, CardContent } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion.tsx';
@@ -56,7 +57,7 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
         >
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-              <span className="text-primary text-xl">📋</span>
+              <FontAwesomeIcon icon={faSearchPlus} className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-lg">{categoria.nome}</h3>
@@ -65,12 +66,12 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-              {filteredFAQs.length} {filteredFAQs.length === 1 ? 'pergunta' : 'perguntas'}
+              {filteredFAQs.length} {filteredFAQs.length === 1 ? 'question' : 'questions'}
             </Badge>
             {isExpanded ? (
-              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              <FontAwesomeIcon icon={faChevronDown} className="h-5 w-5 text-muted-foreground" />
             ) : (
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <FontAwesomeIcon icon={faChevronRight} className="h-5 w-5 text-muted-foreground" />
             )}
           </div>
         </Button>
@@ -107,7 +108,7 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
                     </div>
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/30">
                       <span className="text-xs text-muted-foreground">
-                        Por {faq.autor} • {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('pt-BR') : new Date(faq.dataUpdated).toLocaleDateString('pt-BR')}
+                        By {faq.autor} • {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('en-US') : new Date(faq.dataUpdated).toLocaleDateString('en-US')}
                       </span>
                     </div>
                   </AccordionContent>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit3, Trash2, Eye, Save, X, ArrowLeft, Loader2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faSearch, faEdit, faTrash, faEye, faSave, faTimes, faArrowLeft, faSpinner, faListAlt } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../components/ui/button.tsx';
 import { Input } from '../components/ui/input.tsx';
 import { Textarea } from '../components/ui/textarea.tsx';
@@ -84,8 +85,8 @@ const FAQAdmin = () => {
         if (result) {
           await refetchFaqs();
           toast({
-            title: "FAQ atualizada",
-            description: "A pergunta foi atualizada com sucesso."
+            title: "FAQ Updated",
+        description: "The question has been updated successfully."
           });
           setEditingFAQ(null);
           setIsDialogOpen(false);
@@ -109,8 +110,8 @@ const FAQAdmin = () => {
         if (result) {
           await refetchFaqs();
           toast({
-            title: "FAQ criada",
-            description: "Nova pergunta adicionada com sucesso."
+            title: "FAQ Created",
+        description: "New question added successfully."
           });
           setEditingFAQ(null);
           setIsDialogOpen(false);
@@ -126,8 +127,8 @@ const FAQAdmin = () => {
       onSuccess: () => {
         refetchFaqs();
         toast({
-          title: "FAQ removida",
-          description: "A pergunta foi removida com sucesso."
+          title: "FAQ Removed",
+        description: "The question has been removed successfully."
         });
       }
     });
@@ -147,8 +148,8 @@ const FAQAdmin = () => {
         if (result) {
           await refetchCategories();
           toast({
-            title: "Categoria atualizada",
-            description: "A categoria foi atualizada com sucesso."
+            title: "Category Updated",
+        description: "The category has been updated successfully."
           });
           setEditingCategoria(null);
           setIsCategoryDialogOpen(false);
@@ -164,8 +165,8 @@ const FAQAdmin = () => {
         if (result) {
           await refetchCategories();
           toast({
-            title: "Categoria criada",
-            description: "Nova categoria adicionada com sucesso."
+            title: "Category Created",
+        description: "New category added successfully."
           });
           setEditingCategoria(null);
           setIsCategoryDialogOpen(false);
@@ -181,8 +182,8 @@ const FAQAdmin = () => {
       onSuccess: () => {
         refetchCategories();
         toast({
-          title: "Categoria removida",
-          description: "A categoria foi removida com sucesso."
+          title: "Category Removed",
+        description: "The category has been removed successfully."
         });
       }
     });
@@ -196,14 +197,14 @@ const FAQAdmin = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link to="/faq">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar ao FAQ
-                </Button>
+                <button className="btn-primary gap-2 flex items-center">
+                  <FontAwesomeIcon icon={faArrowLeft} className="icon-action" />
+                  Back to FAQ
+                </button>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold">Painel Administrativo - FAQ</h1>
-                <p className="text-muted-foreground">Gerencie perguntas frequentes e categorias</p>
+                <h1 className="title-1">FAQ Admin Panel</h1>
+        <p className="body-text text-muted-foreground">Manage frequently asked questions and categories</p>
               </div>
             </div>
           </div>
@@ -214,41 +215,41 @@ const FAQAdmin = () => {
         {(faqsLoading || categoriesLoading) && (
           <div className="flex items-center justify-center py-12">
             <div className="flex items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Carregando dados...</span>
+              <FontAwesomeIcon icon={faSpinner} className="h-6 w-6 animate-spin" />
+              <span className="body-text">Carregando dados...</span>
             </div>
           </div>
         )}
 
         {(faqsError || categoriesError) && (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
-            <p className="text-destructive">Erro ao carregar dados</p>
-            <Button 
+            <p className="body-text text-destructive">Erro ao carregar dados</p>
+            <button 
               onClick={() => {
                 refetchFaqs();
                 refetchCategories();
               }}
-              variant="outline"
+              className="btn-secondary"
             >
-              Tentar novamente
-            </Button>
+              Try Again
+            </button>
           </div>
         )}
 
         {!faqsLoading && !categoriesLoading && !faqsError && !categoriesError && (
           <Tabs defaultValue="faqs" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 max-w-md">
-              <TabsTrigger value="faqs">Perguntas</TabsTrigger>
-              <TabsTrigger value="categorias">Categorias</TabsTrigger>
+              <TabsTrigger value="faqs">Questions</TabsTrigger>
+          <TabsTrigger value="categorias">Categories</TabsTrigger>
             </TabsList>
 
           {/* FAQs Tab */}
           <TabsContent value="faqs" className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 icon-action text-muted-foreground" />
                 <Input
-                  placeholder="Buscar FAQs..."
+                  placeholder="Search FAQs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -256,15 +257,18 @@ const FAQAdmin = () => {
               </div>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={() => setEditingFAQ(null)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Nova Pergunta
+                  <Button onClick={() => {
+                    setEditingFAQ(null);
+                    setIsDialogOpen(true);
+                  }} className="gap-2">
+                    <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+                    New Question
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>
-                      {editingFAQ ? 'Editar FAQ' : 'Nova FAQ'}
+                      {editingFAQ ? 'Edit FAQ' : 'New FAQ'}
                     </DialogTitle>
                   </DialogHeader>
                   <FAQForm 
@@ -289,10 +293,10 @@ const FAQAdmin = () => {
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">{faq.categoria}</Badge>
                           <Badge variant={faq.status === 'ativo' ? 'default' : 'secondary'}>
-                            {faq.status}
+                            {faq.status === 'ativo' ? 'Active' : 'Inactive'}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
-                            Prioridade: {faq.prioridade}
+                            Priority: {faq.prioridade}
                           </span>
                         </div>
                         <h3 className="font-semibold text-lg mb-2">{faq.pergunta}</h3>
@@ -311,7 +315,7 @@ const FAQAdmin = () => {
                           ))}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Por {faq.autor} • Atualizado em {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('pt-BR') : new Date(faq.dataUpdated).toLocaleDateString('pt-BR')}
+                          By {faq.autor} • Updated on {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('en-US') : new Date(faq.dataUpdated).toLocaleDateString('en-US')}
                         </div>
                       </div>
                       <div className="flex gap-2 ml-4">
@@ -323,14 +327,14 @@ const FAQAdmin = () => {
                             setIsDialogOpen(true);
                           }}
                         >
-                          <Edit3 className="h-4 w-4" />
+                          <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteFAQ(faq.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -346,14 +350,14 @@ const FAQAdmin = () => {
               <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => setEditingCategoria(null)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Nova Categoria
+                    <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+                    New Category
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
                     <DialogTitle>
-                      {editingCategoria ? 'Editar Categoria' : 'Nova Categoria'}
+                      {editingCategoria ? 'Edit Category' : 'New Category'}
                     </DialogTitle>
                   </DialogHeader>
                   <CategoriaForm 
@@ -375,20 +379,20 @@ const FAQAdmin = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <span className="text-primary text-xl">📁</span>
+                          <FontAwesomeIcon icon={faListAlt} className="h-6 w-6 text-primary" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold">{categoria.nome}</h3>
                             <Badge variant={categoria.status === 'ativo' ? 'default' : 'secondary'}>
-                              {categoria.status}
-                            </Badge>
+                  {categoria.status === 'ativo' ? 'Active' : 'Inactive'}
+                </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground mb-1">
                             {categoria.descricao}
                           </p>
                           <span className="text-xs text-muted-foreground">
-                            Ordem: {categoria.ordem}
+                            Order: {categoria.ordem}
                           </span>
                         </div>
                       </div>
@@ -401,14 +405,14 @@ const FAQAdmin = () => {
                             setIsCategoryDialogOpen(true);
                           }}
                         >
-                          <Edit3 className="h-4 w-4" />
+                          <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteCategoria(categoria.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -472,7 +476,7 @@ function FAQForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="categoria">Categoria</Label>
+          <Label htmlFor="categoria">Category</Label>
           <Select
             value={formData.categoria}
             onValueChange={(value) => {
@@ -485,7 +489,7 @@ function FAQForm({
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Selecione uma categoria" />
+              <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
               {categorias.filter(c => c.status === 'ativo').map(categoria => (
@@ -506,27 +510,27 @@ function FAQForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ativo">Ativo</SelectItem>
-              <SelectItem value="inativo">Inativo</SelectItem>
+              <SelectItem value="ativo">Active</SelectItem>
+          <SelectItem value="inativo">Inactive</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pergunta">Pergunta</Label>
+        <Label htmlFor="pergunta">Question</Label>
         <Input
           id="pergunta"
           value={formData.pergunta}
           onChange={(e) => setFormData({ ...formData, pergunta: e.target.value })}
-          placeholder="Digite a pergunta..."
+          placeholder="Enter the question..."
           required
         />
       </div>
 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <Label htmlFor="resposta">Resposta</Label>
+          <Label htmlFor="resposta">Answer</Label>
           <span className={`text-sm ${
             formData.resposta.length > 3000 
               ? 'text-red-500 font-medium' 
@@ -537,8 +541,8 @@ function FAQForm({
                   : 'text-muted-foreground'
           }`}>
             {formData.resposta.length < 10 
-              ? `Mínimo 10 caracteres (${10 - formData.resposta.length} restantes)`
-              : `${3000 - formData.resposta.length} caracteres restantes`
+              ? `Minimum 10 characters (${10 - formData.resposta.length} remaining)`
+          : `${3000 - formData.resposta.length} characters remaining`
             }
           </span>
         </div>
@@ -550,7 +554,7 @@ function FAQForm({
               setFormData({ ...formData, resposta: e.target.value });
             }
           }}
-          placeholder="Digite a resposta... (mínimo 10 caracteres)"
+          placeholder="Enter the answer... (minimum 10 characters)"
           rows={4}
           required
           minLength={10}
@@ -558,7 +562,7 @@ function FAQForm({
         />
         {formData.resposta.length > 0 && formData.resposta.length < 10 && (
           <p className="text-sm text-red-500">
-            A resposta deve ter pelo menos 10 caracteres.
+            The answer must have at least 10 characters.
           </p>
         )}
       </div>
@@ -575,7 +579,7 @@ function FAQForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="prioridade">Prioridade</Label>
+          <Label htmlFor="prioridade">Priority</Label>
           <Input
             id="prioridade"
             type="number"
@@ -586,27 +590,27 @@ function FAQForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="autor">Autor</Label>
+          <Label htmlFor="autor">Author</Label>
           <Input
             id="autor"
             value={formData.autor}
             onChange={(e) => setFormData({ ...formData, autor: e.target.value })}
-            placeholder="Nome do autor"
+            placeholder="Author name"
           />
         </div>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
         <Button type="button" variant="outline" onClick={onCancel}>
-          <X className="h-4 w-4 mr-2" />
-          Cancelar
+          <FontAwesomeIcon icon={faTimes} className="h-4 w-4 mr-2" />
+          Cancel
         </Button>
         <Button 
           type="submit" 
           disabled={formData.resposta.length < 10 || formData.pergunta.length < 5}
         >
-          <Save className="h-4 w-4 mr-2" />
-          Salvar
+          <FontAwesomeIcon icon={faSave} className="h-4 w-4 mr-2" />
+          Save
         </Button>
       </div>
     </form>
@@ -638,23 +642,23 @@ function CategoriaForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="nome">Nome da Categoria</Label>
+        <Label htmlFor="nome">Category Name</Label>
         <Input
           id="nome"
           value={formData.nome}
           onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-          placeholder="Digite o nome da categoria..."
+          placeholder="Enter the category name..."
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="descricao">Descrição</Label>
+        <Label htmlFor="descricao">Description</Label>
         <Textarea
           id="descricao"
           value={formData.descricao}
           onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-          placeholder="Digite a descrição da categoria..."
+          placeholder="Enter the category description..."
           rows={3}
           required
         />
@@ -662,7 +666,7 @@ function CategoriaForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="ordem">Ordem</Label>
+          <Label htmlFor="ordem">Order</Label>
           <Input
             id="ordem"
             type="number"
@@ -681,8 +685,8 @@ function CategoriaForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ativo">Ativo</SelectItem>
-              <SelectItem value="inativo">Inativo</SelectItem>
+              <SelectItem value="ativo">Active</SelectItem>
+              <SelectItem value="inativo">Inactive</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -690,12 +694,12 @@ function CategoriaForm({
 
       <div className="flex justify-end gap-2 pt-4">
         <Button type="button" variant="outline" onClick={onCancel}>
-          <X className="h-4 w-4 mr-2" />
-          Cancelar
+          <FontAwesomeIcon icon={faTimes} className="h-4 w-4 mr-2" />
+          Cancel
         </Button>
         <Button type="submit">
-          <Save className="h-4 w-4 mr-2" />
-          Salvar
+          <FontAwesomeIcon icon={faSave} className="h-4 w-4 mr-2" />
+          Save
         </Button>
       </div>
     </form>

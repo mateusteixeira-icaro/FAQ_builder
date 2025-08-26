@@ -36,7 +36,7 @@ export function useApi<T>(
       setState({ data: null, loading: false, error: errorMessage });
       
       toast({
-        title: 'Erro na API',
+        title: 'API Error',
         description: errorMessage,
         variant: 'destructive',
       });
@@ -118,8 +118,8 @@ export function useApiMutation<TData, TVariables>(
       setState({ loading: false, error: null });
       
       toast({
-        title: 'Sucesso',
-        description: 'Operação realizada com sucesso!',
+        title: 'Success',
+        description: 'Operation completed successfully!',
       });
       
       return result;
@@ -128,7 +128,7 @@ export function useApiMutation<TData, TVariables>(
       setState({ loading: false, error: errorMessage });
       
       toast({
-        title: 'Erro',
+        title: 'Error',
         description: errorMessage,
         variant: 'destructive',
       });

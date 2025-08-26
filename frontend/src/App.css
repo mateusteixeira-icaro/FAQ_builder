@@ -1,8 +1,72 @@
-/* App.css */
+/* App.css - Design System Styles */
 .App {
   min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
 }
 
+/* FontAwesome Icon Sizes */
+.icon-menu {
+  width: 14px;
+  height: 14px;
+}
 
+.icon-button-home {
+  width: 60px;
+  height: 60px;
+}
+
+.icon-action {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-action-lg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Design System Utility Classes */
+.ds-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.ds-input {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--body);
+  transition: border-color 0.2s ease;
+}
+
+.ds-input:focus {
+  outline: none;
+  border-color: var(--ds-primary-blue);
+  box-shadow: 0 0 0 2px rgba(15, 39, 109, 0.1);
+}
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Roboto', sans-serif;
+}
+
+.ds-badge-primary {
+  background-color: rgba(15, 39, 109, 0.1);
+  color: var(--ds-primary-blue);
+}
+
+.ds-badge-secondary {
+  background-color: rgba(187, 56, 140, 0.1);
+  color: var(--ds-primary-purple);
+}
 
 /* Estilos globais adicionais podem ser adicionados aqui */

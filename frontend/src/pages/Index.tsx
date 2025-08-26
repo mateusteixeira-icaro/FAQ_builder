@@ -1,4 +1,5 @@
-import { HelpCircle, ArrowRight, Search, Users } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle, faSearch, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../components/ui/button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.tsx';
 import { Link } from 'react-router-dom';
@@ -18,7 +19,7 @@ const Index = () => {
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <HelpCircle className="h-10 w-10 text-primary" />
+              <FontAwesomeIcon icon={faQuestionCircle} className="h-10 w-10 text-primary" />
             </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
@@ -32,14 +33,14 @@ const Index = () => {
               to="/faq"
               className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors"
             >
-              <HelpCircle className="mr-2 h-5 w-5" />
+              <FontAwesomeIcon icon={faQuestionCircle} className="mr-2 h-5 w-5" />
               View FAQ
             </Link>
             <Link
               to="/faq/admin"
               className="inline-flex items-center justify-center px-8 py-3 border border-primary text-base font-medium rounded-md text-primary bg-transparent hover:bg-primary hover:text-white transition-colors"
             >
-              <Users className="mr-2 h-5 w-5" />
+              <FontAwesomeIcon icon={faUsers} className="mr-2 h-5 w-5" />
               Admin Panel
             </Link>
           </div>
@@ -51,7 +52,7 @@ const Index = () => {
             <Card className="border-border/50 hover:border-primary/20 transition-all duration-300">
               <CardHeader className="text-center pb-4">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Search className="h-6 w-6 text-primary" />
+                  <FontAwesomeIcon icon={faSearch} className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Smart Search</CardTitle>
               </CardHeader>
@@ -65,7 +66,7 @@ const Index = () => {
             <Card className="border-border/50 hover:border-primary/20 transition-all duration-300">
               <CardHeader className="text-center pb-4">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <HelpCircle className="h-6 w-6 text-primary" />
+                  <FontAwesomeIcon icon={faQuestionCircle} className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle className="text-xl">Category Organization</CardTitle>
               </CardHeader>

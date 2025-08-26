@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Search, HelpCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle, faSearch, faArrowLeft, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Input } from '../components/ui/input.tsx';
 import { Button } from '../components/ui/button.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.tsx';
@@ -63,133 +64,119 @@ const FAQ = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <HelpCircle className="h-5 w-5 text-primary" />
+              <FontAwesomeIcon icon={faQuestionCircle} className="icon-action text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Cirex Help Center</h1>
-              <p className="text-sm text-muted-foreground">Find answers to your questions</p>
+              <h1 className="title-1 text-foreground">Cirex Help Center</h1>
+              <p className="body-text text-muted-foreground">Find answers to your questions</p>
             </div>
           </div>
           <Link to="/">
-            <Button variant="outline" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
+            <button className="btn-primary gap-2 flex items-center">
+              <FontAwesomeIcon icon={faArrowLeft} className="icon-action" />
               Back
-            </Button>
+            </button>
           </Link>
         </div>
 
         {/* Search */}
         <div className="relative mb-8">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
+          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 icon-action text-muted-foreground" />
+          <input
             type="text"
             placeholder="Search for questions, answers or tags..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-12 text-base"
+            className="ds-input pl-10 h-12 w-full body-text"
           />
           {searchTerm && (
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => setSearchTerm('')}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-2"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-2 bg-transparent border-none cursor-pointer text-muted-foreground hover:text-foreground"
             >
-              ✕
-            </Button>
+              <FontAwesomeIcon icon={faTimes} className="icon-action" />
+            </button>
           )}
         </div>
 
         {/* Loading State */}
         {loading && (
-          <Card className="text-center py-12">
-            <CardContent>
-              <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                <Loader2 className="h-8 w-8 text-muted-foreground animate-spin" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Loading...</h3>
-              <p className="text-muted-foreground">
-                Fetching help center information.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="ds-card text-center py-12">
+            <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <FontAwesomeIcon icon={faSpinner} className="h-8 w-8 text-muted-foreground animate-spin" />
+            </div>
+            <h3 className="title-2 mb-2">Loading...</h3>
+            <p className="body-text text-muted-foreground">
+              Fetching help center information.
+            </p>
+          </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
-          <Card className="text-center py-12 border-destructive">
-            <CardContent>
-              <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
-                <HelpCircle className="h-8 w-8 text-destructive" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2 text-destructive">Error loading data</h3>
-              <p className="text-muted-foreground mb-4">
-                {error}
-              </p>
-              <Button onClick={() => window.location.reload()} variant="outline">
-                Try again
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="ds-card text-center py-12 border-destructive">
+            <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
+              <FontAwesomeIcon icon={faQuestionCircle} className="h-8 w-8 text-destructive" />
+            </div>
+            <h3 className="title-2 mb-2 text-destructive">Error loading data</h3>
+            <p className="body-text text-muted-foreground mb-4">
+              {error}
+            </p>
+            <button onClick={() => window.location.reload()} className="btn-secondary">
+              Try again
+            </button>
+          </div>
         )}
 
         {/* Main Content */}
         {!loading && !error && filteredResults.total === 0 && searchTerm ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                <Search className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">No results found</h3>
-              <p className="text-muted-foreground mb-4">
-                Try using different search terms or browse the categories below.
-              </p>
-              <Button onClick={() => setSearchTerm('')} variant="outline">
-                Clear search
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="ds-card text-center py-12">
+            <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <FontAwesomeIcon icon={faSearch} className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="title-2 mb-2">No results found</h3>
+            <p className="body-text text-muted-foreground mb-4">
+              Try using different search terms or browse the categories below.
+            </p>
+            <button onClick={() => setSearchTerm('')} className="btn-accent">
+              Clear search
+            </button>
+          </div>
         ) : !loading && !error ? (
           <>
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-medium text-muted-foreground">
+              <div className="ds-card">
+                <div className="pb-3">
+                  <h4 className="body-text font-medium text-muted-foreground">
                     Total Questions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-primary">{faqsAtivos.length}</div>
-                </CardContent>
-              </Card>
+                  </h4>
+                </div>
+                <div className="title-1 font-bold text-primary">{faqsAtivos.length}</div>
+              </div>
               
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-medium text-muted-foreground">
+              <div className="ds-card">
+                <div className="pb-3">
+                  <h4 className="body-text font-medium text-muted-foreground">
                     Active Categories
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-primary">{categoriasAtivas.length}</div>
-                </CardContent>
-              </Card>
+                  </h4>
+                </div>
+                <div className="title-1 font-bold text-primary">{categoriasAtivas.length}</div>
+              </div>
 
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-medium text-muted-foreground">
+              <div className="ds-card">
+                <div className="pb-3">
+                  <h4 className="body-text font-medium text-muted-foreground">
                     Last Update
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-primary">
-                    {faqsAtivos.length > 0
-                      ? new Date(Math.max(...faqsAtivos.map(f => f.dataUpdated.getTime()))).toLocaleDateString('en-US')
-                      : 'N/A'
-                    }
-                  </div>
-                </CardContent>
-              </Card>
+                  </h4>
+                </div>
+                <div className="title-1 font-bold text-primary">
+                  {faqsAtivos.length > 0
+                    ? new Date(Math.max(...faqsAtivos.map(f => f.dataUpdated.getTime()))).toLocaleDateString('en-US')
+                    : 'N/A'
+                  }
+                </div>
+              </div>
             </div>
 
             {/* Categories */}

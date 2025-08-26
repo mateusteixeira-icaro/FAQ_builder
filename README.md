@@ -311,5 +311,3 @@ Para dúvidas ou problemas:
 - Abra uma issue com Leandro Ruiz :D
 
 ---
-
-**Desenvolvido com ❤️ usando Spring Boot e React** 

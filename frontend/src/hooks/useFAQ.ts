@@ -209,7 +209,6 @@ export function useFAQStats() {
     faqsInativos: faqs.filter(f => f.status === 'inativo').length,
     totalCategorias: categorias.length,
     categoriasAtivas: categorias.filter(c => c.status === 'ativo').length,
-    totalVisualizacoes: faqs.reduce((acc, faq) => acc + (faq.visualizacoes || 0), 0),
     ultimaAtualizacao: faqs.length > 0 
       ? new Date(Math.max(...faqs.map(f => f.dataUpdated.getTime())))
       : null,

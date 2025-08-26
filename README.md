@@ -1,237 +1,263 @@
-# Sistema FAQ - Perguntas Frequentes
+# Sistema de FAQ
 
-Sistema completo de FAQ (Frequently Asked Questions) com backend Java/Spring Boot, frontend React, e banco de dados PostgreSQL.
+Sistema completo de FAQ (Frequently Asked Questions) com frontend React e backend Spring Boot, suportando tanto dados mockados para desenvolvimento quanto banco PostgreSQL para produção.
 
-## 🚀 Funcionalidades
+## 🚀 Características
 
-### Tela Pública
-- Navegação por categorias expansíveis (similar a pastas do Windows)
-- Sistema de busca avançada
-- Visualização organizada das FAQs
-- Contadores de visualização e utilidade
-- Interface responsiva e moderna
-
-### Tela de Administração
-- CRUD completo para Categorias
-- CRUD completo para FAQs
-- Gerenciamento de tags e prioridades
-- Reordenação de itens
-- Interface intuitiva com Material-UI
-
-### API Backend
-- API REST completa
-- Documentação automática com Swagger
-- Validação de dados
-- Suporte a paginação
-- Métricas de uso
-
-## 🛠️ Tecnologias Utilizadas
-
-### Backend
-- Java 17
-- Spring Boot 3.x
-- Spring Data JPA
-- PostgreSQL
-- SpringDoc OpenAPI (Swagger)
-- Maven
-
-### Frontend
-- React 18
-- Material-UI (MUI)
-- React Router DOM
-- Axios
-- React Query
+- **Frontend React** com TypeScript e Tailwind CSS
+- **Backend Spring Boot** com API REST
+- **Suporte Híbrido**: Mockup (H2) para desenvolvimento e PostgreSQL para produção
+- **CRUD Completo** para FAQs e Categorias
+- **Busca Avançada** com filtros
+- **Interface Responsiva** e moderna
+- **Painel Administrativo** completo
 
 ## 📋 Pré-requisitos
 
-- Java 17 ou superior
-- Node.js 16 ou superior
-- PostgreSQL 12 ou superior
-- Maven 3.6 ou superior
+### Para Desenvolvimento (Mockup)
+- **Java 17** ou superior
+- **Node.js 18** ou superior
+- **npm** ou **yarn**
+- **Git**
 
-## 🔧 Instalação e Configuração
+### Para Produção (PostgreSQL)
+- Todos os itens acima +
+- **PostgreSQL 12** ou superior
 
-### 1. Configuração do Banco de Dados
+## 🛠️ Instalação
 
-```sql
--- Criar banco de dados
-CREATE DATABASE faq_system;
-
--- Criar usuário (opcional)
-CREATE USER faq_user WITH PASSWORD 'faq_password';
-GRANT ALL PRIVILEGES ON DATABASE faq_system TO faq_user;
+### 1. Clone o Repositório
+```bash
+git clone <url-do-repositorio>
+cd ProjetoFAQ
 ```
 
 ### 2. Configuração do Backend
 
+#### Modo Desenvolvimento (Mockup - Padrão)
 ```bash
-# Navegar para o diretório do backend
 cd backend
 
-# Configurar as propriedades do banco (se necessário)
-# Editar src/main/resources/application.yml
+# Compilar e executar
+./mvnw spring-boot:run
 
-# Instalar dependências e executar
-mvn clean install
-mvn spring-boot:run
+# Ou no Windows
+.\mvnw.cmd spring-boot:run
 ```
 
-O backend estará disponível em: `http://localhost:8080`
+O backend estará disponível em: `http://localhost:8080/api`
+
+#### Modo Produção (PostgreSQL)
+
+1. **Instalar e configurar PostgreSQL:**
+```sql
+-- Conectar como superusuário
+CREATE DATABASE faqdb;
+CREATE USER faq_user WITH PASSWORD 'faq_password';
+GRANT ALL PRIVILEGES ON DATABASE faqdb TO faq_user;
+```
+
+2. **Executar scripts de inicialização:**
+```bash
+# Conectar ao banco faqdb
+psql -U faq_user -d faqdb
+
+# Executar schema
+\i src/main/resources/schema-postgresql.sql
+
+# Executar dados de exemplo (opcional)
+\i src/main/resources/data-postgresql.sql
+```
+
+3. **Executar com profile de produção:**
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
+
+# Ou compilar JAR e executar
+./mvnw clean package
+java -jar target/faq-backend-1.0.0.jar --spring.profiles.active=prod
+```
 
 ### 3. Configuração do Frontend
 
 ```bash
-# Navegar para o diretório do frontend
 cd frontend
 
 # Instalar dependências
 npm install
 
-# Executar em modo de desenvolvimento
+# Executar em modo desenvolvimento
 npm start
 ```
 
 O frontend estará disponível em: `http://localhost:3000`
 
-## 🌐 URLs Importantes
+## 🔧 Configuração
 
-- **Interface Pública**: http://localhost:3000/
-- **Interface de Administração**: http://localhost:3000/admin
-- **Página de Teste**: http://localhost:3000/test
-- **API Backend**: http://localhost:8080/api
-- **Documentação da API**: http://localhost:8080/swagger-ui.html
+### Profiles do Spring Boot
 
-## 📊 Estrutura do Banco de Dados
+#### Desenvolvimento (`dev` - padrão)
+- Banco H2 em memória
+- Dados mockados
+- Logs detalhados
+- Console H2 habilitado
 
-### Tabela: categories
-- `id` (BIGINT, PK)
-- `name` (VARCHAR, NOT NULL)
-- `description` (TEXT)
-- `display_order` (INTEGER)
-- `active` (BOOLEAN)
-- `created_at` (TIMESTAMP)
-- `updated_at` (TIMESTAMP)
+#### Produção (`prod`)
+- Banco PostgreSQL
+- Logs otimizados
+- Configurações de segurança
+- Pool de conexões configurado
 
-### Tabela: faqs
-- `id` (BIGINT, PK)
-- `question` (TEXT, NOT NULL)
-- `answer` (TEXT, NOT NULL)
-- `category_id` (BIGINT, FK)
-- `tags` (VARCHAR)
-- `priority` (INTEGER)
-- `active` (BOOLEAN)
-- `display_order` (INTEGER)
-- `view_count` (INTEGER)
-- `helpful_count` (INTEGER)
-- `not_helpful_count` (INTEGER)
-- `meta_description` (VARCHAR)
-- `created_at` (TIMESTAMP)
-- `updated_at` (TIMESTAMP)
-- `created_by` (VARCHAR)
-- `updated_by` (VARCHAR)
+### Variáveis de Ambiente (Produção)
 
-## 🔍 Testando o Sistema
+```bash
+# Banco de dados
+export DB_URL=jdbc:postgresql://localhost:5432/faqdb
+export DB_USERNAME=faq_user
+export DB_PASSWORD=faq_password
 
-### Teste Automático
-1. Acesse `http://localhost:3000/test`
-2. Clique em "Executar Todos os Testes"
-3. Verifique se todos os testes passaram
+# Executar com variáveis
+java -jar faq-backend-1.0.0.jar --spring.profiles.active=prod
+```
 
-### Teste Manual
-1. **Administração**:
-   - Acesse `/admin`
-   - Crie algumas categorias
-   - Crie algumas FAQs
-   - Teste as funcionalidades de edição e exclusão
+### Configuração do Frontend
 
-2. **Interface Pública**:
-   - Acesse `/`
-   - Teste a navegação por categorias
-   - Teste a funcionalidade de busca
-   - Teste os botões de "útil/não útil"
+O frontend está configurado para se conectar ao backend em `http://localhost:8080/api`. Para alterar:
 
-## 📝 API Endpoints
+```typescript
+// src/services/api.ts
+const API_BASE_URL = 'http://seu-servidor:8080/api';
+```
 
-### Categorias
-- `GET /api/categories` - Listar todas as categorias
-- `GET /api/categories/active` - Listar categorias ativas
-- `GET /api/categories/{id}` - Buscar categoria por ID
-- `POST /api/categories` - Criar categoria
-- `PUT /api/categories/{id}` - Atualizar categoria
-- `DELETE /api/categories/{id}` - Excluir categoria
+## 📚 Uso
 
-### FAQs
-- `GET /api/faqs` - Listar todas as FAQs
-- `GET /api/faqs/active` - Listar FAQs ativas
-- `GET /api/faqs/search?q={termo}` - Buscar FAQs
-- `GET /api/faqs/category/{id}` - FAQs por categoria
-- `POST /api/faqs` - Criar FAQ
-- `PUT /api/faqs/{id}` - Atualizar FAQ
-- `DELETE /api/faqs/{id}` - Excluir FAQ
-- `PATCH /api/faqs/{id}/view` - Incrementar visualizações
-- `PATCH /api/faqs/{id}/helpful` - Marcar como útil
+### Página Pública
+- Acesse `http://localhost:3000`
+- Visualize FAQs por categoria
+- Use a busca para encontrar respostas
+- Navegue pelas categorias
+
+### Painel Administrativo
+- Acesse `http://localhost:3000/admin`
+- Gerencie categorias e FAQs
+- Ative/desative itens
+- Organize por prioridade
+
+### API REST
+
+Base URL: `http://localhost:8080/api`
+
+#### Categorias
+- `GET /categories` - Listar todas
+- `GET /categories/with-faqs` - Categorias com FAQs ativos
+- `POST /categories` - Criar categoria
+- `PUT /categories/{id}` - Atualizar categoria
+- `DELETE /categories/{id}` - Excluir categoria
+
+#### FAQs
+- `GET /faqs` - Listar FAQs ativos
+- `GET /faqs/search?q=termo` - Buscar FAQs
+- `POST /faqs` - Criar FAQ
+- `PUT /faqs/{id}` - Atualizar FAQ
+- `PATCH /faqs/{id}/status` - Alterar status
+- `DELETE /faqs/{id}` - Excluir FAQ
+
+## 🐳 Docker (Opcional)
+
+### Backend
+```dockerfile
+# Dockerfile
+FROM openjdk:17-jdk-slim
+COPY target/faq-backend-1.0.0.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+### Frontend
+```dockerfile
+# Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
 
 ## 🚀 Deploy
 
-### Docker (Recomendado)
-```bash
-# Construir imagens
-docker-compose build
+### Desenvolvimento
+1. Execute o backend: `./mvnw spring-boot:run`
+2. Execute o frontend: `npm start`
 
-# Executar
-docker-compose up -d
+### Produção
+1. Configure PostgreSQL
+2. Execute scripts de banco
+3. Compile: `./mvnw clean package`
+4. Execute: `java -jar target/faq-backend-1.0.0.jar --spring.profiles.active=prod`
+5. Build frontend: `npm run build`
+6. Sirva arquivos estáticos
+
+## 🔍 Troubleshooting
+
+### Problemas Comuns
+
+1. **Erro de conexão com banco:**
+   - Verifique se PostgreSQL está rodando
+   - Confirme credenciais em `application-prod.properties`
+
+2. **Frontend não conecta com backend:**
+   - Verifique se backend está rodando na porta 8080
+   - Confirme URL em `src/services/api.ts`
+
+3. **Erro de CORS:**
+   - Backend já configurado para `http://localhost:3000`
+   - Para outros domínios, ajuste `@CrossOrigin` nos controllers
+
+### Logs
+
+```bash
+# Backend logs
+tail -f logs/spring.log
+
+# Frontend logs
+# Disponíveis no console do navegador
 ```
 
-### Deploy Manual
-1. **Backend**: Gerar JAR com `mvn clean package` e executar
-2. **Frontend**: Gerar build com `npm run build` e servir com nginx
-3. **Banco**: Configurar PostgreSQL em produção
+## 📝 Estrutura do Projeto
 
-## 🔧 Configurações Avançadas
-
-### Variáveis de Ambiente
-
-**Backend**:
-- `DB_HOST` - Host do banco de dados
-- `DB_PORT` - Porta do banco de dados
-- `DB_NAME` - Nome do banco de dados
-- `DB_USER` - Usuário do banco
-- `DB_PASSWORD` - Senha do banco
-
-**Frontend**:
-- `REACT_APP_API_URL` - URL da API backend
-
-## 🐛 Solução de Problemas
-
-### Erro de Conexão com Banco
-- Verifique se o PostgreSQL está rodando
-- Confirme as credenciais no `application.yml`
-- Teste a conexão manualmente
-
-### Erro de CORS
-- Verifique se o backend está configurado para aceitar requisições do frontend
-- Confirme as URLs nas configurações de CORS
-
-### Erro 404 nas Rotas
-- Verifique se o React Router está configurado corretamente
-- Confirme se todas as rotas estão definidas no `App.js`
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+```
+ProjetoFAQ/
+├── backend/                 # Spring Boot API
+│   ├── src/main/java/      # Código fonte Java
+│   ├── src/main/resources/ # Configurações e SQL
+│   └── pom.xml            # Dependências Maven
+├── frontend/               # React App
+│   ├── src/               # Código fonte TypeScript
+│   ├── public/            # Arquivos públicos
+│   └── package.json       # Dependências npm
+└── README.md              # Esta documentação
+```
 
 ## 🤝 Contribuição
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+1. Fork o projeto
+2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
+3. Commit: `git commit -m 'Adiciona nova funcionalidade'`
+4. Push: `git push origin feature/nova-funcionalidade`
 5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ## 📞 Suporte
 
-Para suporte, abra uma issue no repositório ou entre em contato através do email.
+Para dúvidas ou problemas:
+- Abra uma issue com Leandro Ruiz :D
 
 ---
 
-**Desenvolvido com ❤️ para facilitar o gerenciamento de FAQs**
+**Desenvolvido com ❤️ usando Spring Boot e React** 

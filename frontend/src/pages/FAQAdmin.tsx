@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Search, Edit3, Trash2, Eye, Save, X, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, Edit3, Trash2, Eye, Save, X, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button.tsx';
 import { Input } from '../components/ui/input.tsx';
 import { Textarea } from '../components/ui/textarea.tsx';
@@ -9,20 +9,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Label } from '../components/ui/label.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs.tsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog.tsx';
-import { FAQ, Categoria } from '../types/faq.ts';
-import { mockFAQs, mockCategorias } from '../data/mockData.ts';
+import { FormattedText } from '../components/ui/FormattedText.tsx';
+import { FAQ, Categoria, Category, faqToOldFormat, categoryToCategoria } from '../types/faq.ts';
 import { Link } from 'react-router-dom';
 import { useToast } from '../hooks/use-toast.ts';
+import { 
+  useFaqs, 
+  useCategories, 
+  useCreateFaq, 
+  useUpdateFaq, 
+  useDeleteFaq, 
+  useCreateCategory, 
+  useUpdateCategory, 
+  useDeleteCategory,
+  useUpdateFaqStatus
+} from '../hooks/useApi.ts';
 
 const FAQAdmin = () => {
   const { toast } = useToast();
-  const [faqs, setFaqs] = useState<FAQ[]>(mockFAQs);
-  const [categorias, setCategorias] = useState<Categoria[]>(mockCategorias);
+  
+  // API hooks
+  const { data: faqsData, loading: faqsLoading, error: faqsError, refetch: refetchFaqs } = useFaqs();
+  const { data: categoriesData, loading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories();
+  
+  // Mutation hooks
+  const createFaq = useCreateFaq();
+  const updateFaq = useUpdateFaq();
+  const deleteFaq = useDeleteFaq();
+  const updateFaqStatus = useUpdateFaqStatus();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
+  
+  // Local state
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
+  const [editingFAQ, setEditingFAQ] = useState<any>(null);
   const [editingCategoria, setEditingCategoria] = useState<Categoria | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  
+  // Convert API data to legacy format for compatibility
+  const faqs = faqsData ? faqsData.map(faq => faqToOldFormat(faq, categoriesData)) : [];
+  const categorias = categoriesData ? categoriesData.map(categoryToCategoria) : [];
+  
+  const loading = faqsLoading || categoriesLoading;
+  const error = faqsError || categoriesError;
 
   const filteredFAQs = faqs.filter(faq =>
     faq.pergunta.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,86 +62,129 @@ const FAQAdmin = () => {
     faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleSaveFAQ = (faqData: Partial<FAQ>) => {
-    if (editingFAQ) {
-      // Edit existing
-      const updatedFAQ = {
-        ...editingFAQ,
-        ...faqData,
-        dataUpdated: new Date()
-      };
-      setFaqs(faqs.map(f => f.id === editingFAQ.id ? updatedFAQ : f));
-      toast({
-        title: "FAQ atualizada",
-        description: "A pergunta foi atualizada com sucesso."
-      });
-    } else {
-      // Create new
-      const newFAQ: FAQ = {
-        id: Date.now().toString(),
-        categoria: faqData.categoria || '',
-        pergunta: faqData.pergunta || '',
-        resposta: faqData.resposta || '',
-        tags: faqData.tags || [],
-        status: faqData.status || 'ativo',
-        prioridade: faqData.prioridade || 1,
-        autor: faqData.autor || 'Admin',
-        dataCreated: new Date(),
-        dataUpdated: new Date(),
-        visualizacoes: 0
-      };
-      setFaqs([...faqs, newFAQ]);
-      toast({
-        title: "FAQ criada",
-        description: "Nova pergunta adicionada com sucesso."
-      });
+  const handleSaveFAQ = async (faqData: Partial<any>) => {
+    try {
+      if (editingFAQ) {
+        // Edit existing
+        const categoryName = categorias.find(c => c.nome === faqData.categoria)?.nome || faqData.categoria;
+        const categoryId = categoriesData?.find(c => c.name === categoryName)?.id || '';
+        
+        const updateData = {
+          id: editingFAQ.id,
+          categoryId,
+          question: faqData.pergunta,
+          answer: faqData.resposta,
+          tags: faqData.tags || [],
+          isActive: faqData.status === 'ativo',
+          priority: faqData.prioridade || 1,
+          author: faqData.autor || 'Admin'
+        };
+        
+        const result = await updateFaq.mutate(updateData);
+        if (result) {
+          await refetchFaqs();
+          toast({
+            title: "FAQ atualizada",
+            description: "A pergunta foi atualizada com sucesso."
+          });
+          setEditingFAQ(null);
+          setIsDialogOpen(false);
+        }
+      } else {
+        // Create new
+        const categoryName = faqData.categoria;
+        const categoryId = categoriesData?.find(c => c.name === categoryName)?.id || '';
+        
+        const newFaqData = {
+          categoryId,
+          question: faqData.pergunta,
+          answer: faqData.resposta,
+          tags: faqData.tags || [],
+          isActive: faqData.status === 'ativo',
+          priority: faqData.prioridade || 1,
+          author: faqData.autor || 'Admin'
+        };
+        
+        const result = await createFaq.mutate(newFaqData);
+        if (result) {
+          await refetchFaqs();
+          toast({
+            title: "FAQ criada",
+            description: "Nova pergunta adicionada com sucesso."
+          });
+          setEditingFAQ(null);
+          setIsDialogOpen(false);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar FAQ:', error);
     }
-    setEditingFAQ(null);
-    setIsDialogOpen(false);
   };
 
   const handleDeleteFAQ = (id: string) => {
-    setFaqs(faqs.filter(f => f.id !== id));
-    toast({
-      title: "FAQ removida",
-      description: "A pergunta foi removida com sucesso."
+    deleteFaq.mutate(id, {
+      onSuccess: () => {
+        refetchFaqs();
+        toast({
+          title: "FAQ removida",
+          description: "A pergunta foi removida com sucesso."
+        });
+      }
     });
   };
 
-  const handleSaveCategoria = (catData: Partial<Categoria>) => {
-    if (editingCategoria) {
-      // Edit existing
-      const updatedCategoria = { ...editingCategoria, ...catData };
-      setCategorias(categorias.map(c => c.id === editingCategoria.id ? updatedCategoria : c));
-      toast({
-        title: "Categoria atualizada",
-        description: "A categoria foi atualizada com sucesso."
-      });
-    } else {
-      // Create new
-      const newCategoria: Categoria = {
-        id: Date.now().toString(),
-        nome: catData.nome || '',
-        descricao: catData.descricao || '',
-        icone: catData.icone || 'Folder',
-        ordem: catData.ordem || categorias.length + 1,
-        status: catData.status || 'ativo'
-      };
-      setCategorias([...categorias, newCategoria]);
-      toast({
-        title: "Categoria criada",
-        description: "Nova categoria adicionada com sucesso."
-      });
+  const handleSaveCategoria = async (catData: Partial<Categoria>) => {
+    try {
+      if (editingCategoria) {
+        // Edit existing
+        const result = await updateCategory.mutate({
+          id: editingCategoria.id,
+          name: catData.nome || editingCategoria.nome,
+          description: catData.descricao || editingCategoria.descricao,
+          displayOrder: catData.ordem || editingCategoria.ordem
+        });
+        
+        if (result) {
+          await refetchCategories();
+          toast({
+            title: "Categoria atualizada",
+            description: "A categoria foi atualizada com sucesso."
+          });
+          setEditingCategoria(null);
+          setIsCategoryDialogOpen(false);
+        }
+      } else {
+        // Create new
+        const result = await createCategory.mutate({
+          name: catData.nome || '',
+          description: catData.descricao || '',
+          displayOrder: catData.ordem || categorias.length + 1
+        });
+        
+        if (result) {
+          await refetchCategories();
+          toast({
+            title: "Categoria criada",
+            description: "Nova categoria adicionada com sucesso."
+          });
+          setEditingCategoria(null);
+          setIsCategoryDialogOpen(false);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar categoria:', error);
     }
-    setEditingCategoria(null);
-    setIsCategoryDialogOpen(false);
   };
 
   const handleDeleteCategoria = (id: string) => {
-    setCategorias(categorias.filter(c => c.id !== id));
-    toast({
-      title: "Categoria removida",
-      description: "A categoria foi removida com sucesso."
+    deleteCategory.mutate(id, {
+      onSuccess: () => {
+        refetchCategories();
+        toast({
+          title: "Categoria removida",
+          description: "A categoria foi removida com sucesso."
+        });
+      }
     });
   };
 
@@ -137,11 +211,36 @@ const FAQAdmin = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="faqs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="faqs">Perguntas</TabsTrigger>
-            <TabsTrigger value="categorias">Categorias</TabsTrigger>
-          </TabsList>
+        {(faqsLoading || categoriesLoading) && (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span>Carregando dados...</span>
+            </div>
+          </div>
+        )}
+
+        {(faqsError || categoriesError) && (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <p className="text-destructive">Erro ao carregar dados</p>
+            <Button 
+              onClick={() => {
+                refetchFaqs();
+                refetchCategories();
+              }}
+              variant="outline"
+            >
+              Tentar novamente
+            </Button>
+          </div>
+        )}
+
+        {!faqsLoading && !categoriesLoading && !faqsError && !categoriesError && (
+          <Tabs defaultValue="faqs" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 max-w-md">
+              <TabsTrigger value="faqs">Perguntas</TabsTrigger>
+              <TabsTrigger value="categorias">Categorias</TabsTrigger>
+            </TabsList>
 
           {/* FAQs Tab */}
           <TabsContent value="faqs" className="space-y-6">
@@ -197,9 +296,13 @@ const FAQAdmin = () => {
                           </span>
                         </div>
                         <h3 className="font-semibold text-lg mb-2">{faq.pergunta}</h3>
-                        <p className="text-muted-foreground mb-3 line-clamp-2">
-                          {faq.resposta}
-                        </p>
+                        <div className="text-muted-foreground mb-3 line-clamp-3">
+                          <FormattedText 
+                            text={faq.resposta} 
+                            className="" 
+                            enableMarkdown={true}
+                          />
+                        </div>
                         <div className="flex flex-wrap gap-1 mb-3">
                           {faq.tags.map(tag => (
                             <Badge key={tag} variant="outline" className="text-xs">
@@ -208,8 +311,7 @@ const FAQAdmin = () => {
                           ))}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Por {faq.autor} • Atualizado em {faq.dataUpdated.toLocaleDateString('pt-BR')}
-                          {faq.visualizacoes && ` • ${faq.visualizacoes} visualizações`}
+                          Por {faq.autor} • Atualizado em {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('pt-BR') : new Date(faq.dataUpdated).toLocaleDateString('pt-BR')}
                         </div>
                       </div>
                       <div className="flex gap-2 ml-4">
@@ -315,7 +417,8 @@ const FAQAdmin = () => {
               ))}
             </div>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        )}
       </div>
     </div>
   );
@@ -343,11 +446,25 @@ function FAQForm({
     autor: faq?.autor || 'Admin'
   });
 
+  // Função para atualizar tags quando categoria muda
+  const updateTagsWithCategory = (selectedCategory: string) => {
+    if (!selectedCategory) return '';
+    
+    // Limpa o campo de tags e mantém apenas a categoria selecionada
+    return selectedCategory;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar se a resposta tem pelo menos 10 caracteres
+    if (formData.resposta.length < 10) {
+      return; // Não enviar o formulário se a validação falhar
+    }
+    
     onSave({
       ...formData,
-      tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
+      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
     });
   };
 
@@ -358,7 +475,14 @@ function FAQForm({
           <Label htmlFor="categoria">Categoria</Label>
           <Select
             value={formData.categoria}
-            onValueChange={(value) => setFormData({ ...formData, categoria: value })}
+            onValueChange={(value) => {
+              const updatedTags = updateTagsWithCategory(value);
+              setFormData({ 
+                ...formData, 
+                categoria: value,
+                tags: updatedTags
+              });
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione uma categoria" />
@@ -401,15 +525,42 @@ function FAQForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="resposta">Resposta</Label>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="resposta">Resposta</Label>
+          <span className={`text-sm ${
+            formData.resposta.length > 3000 
+              ? 'text-red-500 font-medium' 
+              : formData.resposta.length > 2700 
+                ? 'text-yellow-600' 
+                : formData.resposta.length < 10
+                  ? 'text-red-500 font-medium'
+                  : 'text-muted-foreground'
+          }`}>
+            {formData.resposta.length < 10 
+              ? `Mínimo 10 caracteres (${10 - formData.resposta.length} restantes)`
+              : `${3000 - formData.resposta.length} caracteres restantes`
+            }
+          </span>
+        </div>
         <Textarea
           id="resposta"
           value={formData.resposta}
-          onChange={(e) => setFormData({ ...formData, resposta: e.target.value })}
-          placeholder="Digite a resposta..."
+          onChange={(e) => {
+            if (e.target.value.length <= 3000) {
+              setFormData({ ...formData, resposta: e.target.value });
+            }
+          }}
+          placeholder="Digite a resposta... (mínimo 10 caracteres)"
           rows={4}
           required
+          minLength={10}
+          maxLength={3000}
         />
+        {formData.resposta.length > 0 && formData.resposta.length < 10 && (
+          <p className="text-sm text-red-500">
+            A resposta deve ter pelo menos 10 caracteres.
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -450,7 +601,10 @@ function FAQForm({
           <X className="h-4 w-4 mr-2" />
           Cancelar
         </Button>
-        <Button type="submit">
+        <Button 
+          type="submit" 
+          disabled={formData.resposta.length < 10 || formData.pergunta.length < 5}
+        >
           <Save className="h-4 w-4 mr-2" />
           Salvar
         </Button>

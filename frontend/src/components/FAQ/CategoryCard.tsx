@@ -4,12 +4,13 @@ import { Card, CardContent } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion.tsx';
 import { Badge } from '../ui/badge.tsx';
-import { FAQ, Categoria } from '../../types/faq.ts';
+import { FormattedText } from '../ui/FormattedText.tsx';
+import { Categoria } from '../../types/faq.ts';
 import { cn } from '../../lib/utils.ts';
 
 interface CategoryCardProps {
   categoria: Categoria;
-  faqs: FAQ[];
+  faqs: any[]; // Using any for compatibility with converted FAQ format
   searchTerm: string;
 }
 
@@ -21,7 +22,7 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
     const matchesSearch = searchTerm === '' || 
       faq.pergunta.toLowerCase().includes(searchTerm.toLowerCase()) ||
       faq.resposta.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      (faq.tags && faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())));
     
     return matchesCategory && matchesSearch && faq.status === 'ativo';
   });
@@ -88,7 +89,7 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
                         {highlightText(faq.pergunta)}
                       </h4>
                       <div className="flex gap-1 mt-2">
-                        {faq.tags.map(tag => (
+                        {faq.tags && faq.tags.map(tag => (
                           <Badge key={tag} variant="outline" className="text-xs">
                             {tag}
                           </Badge>
@@ -98,19 +99,16 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-4">
                     <div className="prose prose-sm max-w-none">
-                      <p className="text-muted-foreground leading-relaxed">
-                        {highlightText(faq.resposta)}
-                      </p>
+                      <FormattedText 
+                        text={faq.resposta} 
+                        className="text-muted-foreground" 
+                        enableMarkdown={true}
+                      />
                     </div>
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/30">
                       <span className="text-xs text-muted-foreground">
-                        Por {faq.autor} • {faq.dataUpdated.toLocaleDateString('pt-BR')}
+                        Por {faq.autor} • {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('pt-BR') : new Date(faq.dataUpdated).toLocaleDateString('pt-BR')}
                       </span>
-                      {faq.visualizacoes && (
-                        <span className="text-xs text-muted-foreground">
-                          {faq.visualizacoes} visualizações
-                        </span>
-                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>

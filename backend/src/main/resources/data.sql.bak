@@ -1,0 +1,18 @@
+-- Dados iniciais para o banco H2 (desenvolvimento)
+-- Inserir categorias
+INSERT INTO categories (name, description) VALUES
+('Geral', 'Perguntas gerais sobre o sistema'),
+('Conta', 'Questões relacionadas à conta do usuário'),
+('Pagamento', 'Dúvidas sobre pagamentos e faturamento'),
+('Suporte Técnico', 'Problemas técnicos e troubleshooting'),
+('Recursos', 'Funcionalidades e recursos do sistema');
+
+-- Inserir FAQs de exemplo
+INSERT INTO faqs (category_id, question, answer, is_active, view_count) VALUES
+(1, 'Como funciona o sistema?', 'O sistema é uma plataforma de FAQ que permite gerenciar perguntas e respostas de forma organizada.', true, 0),
+(1, 'Posso personalizar a interface?', 'Sim, o sistema oferece várias opções de personalização da interface.', true, 0),
+(2, 'Como criar uma conta?', 'Para criar uma conta, clique no botão "Registrar" e preencha os dados solicitados.', true, 0),
+(2, 'Esqueci minha senha', 'Use a opção "Esqueci minha senha" na tela de login para redefinir sua senha.', true, 0),
+(3, 'Quais formas de pagamento são aceitas?', 'Aceitamos cartão de crédito, débito, PIX e boleto bancário.', true, 0),
+(4, 'O sistema está lento', 'Verifique sua conexão com a internet e limpe o cache do navegador.', true, 0),
+(5, 'Como usar a busca avançada?', 'A busca avançada permite filtrar por categoria, tags e data de criação.', true, 0);

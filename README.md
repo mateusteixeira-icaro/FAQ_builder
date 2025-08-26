@@ -249,6 +249,58 @@ ProjetoFAQ/
 4. Push: `git push origin feature/nova-funcionalidade`
 5. Abra um Pull Request
 
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+## Arquivos que Precisam ser Alterados para Implementar Ordenação por "Ordem"
+Para que o campo "Ordem" (displayOrder) funcione efetivamente na ordenação das categorias, você precisa alterar 2 arquivos principais :
+
+### 1. CategoryRepository.java (Linha 32)
+Arquivo: `CategoryRepository.java`
+
+Alteração necessária:
+```
+// ATUAL (linha 32):
+List<Category> 
+findAllByOrderByNameAsc();
+
+// ALTERAR PARA:
+List<Category> 
+findAllByOrderByDisplayOrderAsc();
+```
+### 2. CategoryRepository.java (Linhas 37-40)
+Método: `findCategoriesWithActiveFaqs`
+
+Alteração necessária:
+```
+// ATUAL (linha 40):
+ORDER BY c.name ASC
+
+// ALTERAR PARA:
+ORDER BY c.displayOrder ASC
+```
+### 3. CategoryRepository.java (Linha 54)
+Método: `findCategoriesWithFaqs`
+
+Alteração necessária:
+```
+// ATUAL (linha 54):
+ORDER BY c.name ASC
+
+// ALTERAR PARA:
+ORDER BY c.displayOrder ASC
+```
+### 📋 Resumo das Alterações
+Impacto: Após essas alterações, todas as listagens de categorias no sistema respeitarão a ordem definida no campo "Ordem" ao invés da ordem alfabética.
+
+Métodos afetados:
+
+- findAll() no CategoryService (usado na listagem geral)
+- findCategoriesWithActiveFaqs() (usado no frontend)
+- findCategoriesWithFaqs() (usado em consultas específicas)
+
+------------------------------------------------------------------------
+
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.

@@ -1,5 +1,12 @@
 # Sistema de FAQ
 
+
+<img width="1141" height="613" alt="image" src="https://github.com/user-attachments/assets/82d69bca-d45b-459c-a499-909b44322783" />
+<img width="1153" height="607" alt="image" src="https://github.com/user-attachments/assets/0d5bc139-10b5-4952-9bf4-f56083cddf8e" />
+
+Atualizado na V3 - incluido feedback das respostas e Views de cada pergunta.
+
+
 Sistema completo de FAQ (Frequently Asked Questions) com frontend React e backend Spring Boot, suportando tanto dados mockados para desenvolvimento quanto banco PostgreSQL para produção.
 
 ## 🚀 Características

@@ -1,0 +1,7 @@
+{
+  "categoryId": 2,
+  "question": "Como posso testar o sistema de FAQ completo?",
+  "answer": "Para testar o sistema completo: 1) Acesse a interface administrativa em /faq/admin, 2) Cadastre novos FAQs, 3) Teste a funcionalidade de feedback (like/dislike), 4) Verifique as estatisticas de visualizacao, 5) Teste a busca e filtros. O sistema possui integracao completa entre frontend React e backend Spring Boot.",
+  "isActive": true,
+  "priority": 1
+}

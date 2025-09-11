@@ -181,3 +181,10 @@ export function useUpdateFaqStatus() {
     apiService.updateFaqStatus(id, isActive)
   );
 }
+
+// Hook para incrementar visualizações
+export function useIncrementFaqViews() {
+  return useApiMutation((faqId: string) => 
+    apiService.incrementFaqViews(faqId)
+  );
+}

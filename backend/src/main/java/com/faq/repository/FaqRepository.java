@@ -1,6 +1,8 @@
 package com.faq.repository;
 
 import com.faq.model.Faq;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -56,6 +58,18 @@ public interface FaqRepository extends JpaRepository<Faq, Long> {
     @Query("SELECT f FROM Faq f WHERE f.isActive = true " +
            "ORDER BY f.viewCount DESC, f.createdAt DESC")
     List<Faq> findMostViewedActiveFaqs();
+    
+    /**
+     * Busca FAQs ativos ordenados por view_count com paginação
+     */
+    Page<Faq> findByIsActiveTrueOrderByViewCountDescCreatedAtDesc(Pageable pageable);
+    
+    /**
+     * Busca FAQs ativos com visualizações (view_count > 0) ordenados por view_count com paginação
+     */
+    @Query("SELECT f FROM Faq f WHERE f.isActive = true AND f.viewCount > 0 " +
+           "ORDER BY f.viewCount DESC, f.createdAt DESC")
+    Page<Faq> findByIsActiveTrueAndViewCountGreaterThanZeroOrderByViewCountDescCreatedAtDesc(Pageable pageable);
     
     /**
      * Busca FAQs mais recentes

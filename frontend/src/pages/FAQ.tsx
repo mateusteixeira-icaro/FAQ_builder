@@ -14,9 +14,17 @@ const FAQ = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
 
   // Fetch data from API
-  const { data: categories, loading: categoriesLoading, error: categoriesError } = useCategoriesWithActiveFaqs();
-  const { data: faqs, loading: faqsLoading, error: faqsError } = useActiveFaqs();
+  const { data: categories, loading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategoriesWithActiveFaqs();
+  const { data: faqs, loading: faqsLoading, error: faqsError, refetch: refetchFaqs } = useActiveFaqs();
   const { data: searchResults, loading: searchLoading } = useSearchFaqs(searchTerm.trim());
+
+  // Debug logs removed
+
+  // Callback para atualizar dados após incremento de visualizações
+  const handleFaqUpdate = () => {
+    refetchFaqs();
+    refetchCategories();
+  };
 
   const loading = categoriesLoading || faqsLoading || (searchTerm.trim() && searchLoading);
   const error = categoriesError || faqsError;
@@ -187,6 +195,7 @@ const FAQ = () => {
                   categoria={categoria}
                   faqs={faqsAtivos}
                   searchTerm={searchTerm}
+                  onFaqUpdate={handleFaqUpdate}
                 />
               ))}
             </div>

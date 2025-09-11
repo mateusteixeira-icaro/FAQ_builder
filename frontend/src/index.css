@@ -10,6 +10,10 @@
     --ds-primary-purple: #BB388C;
     --ds-primary-light-blue: #3470d9;
     
+    /* Radix Accordion Variables */
+    --radix-accordion-content-height: var(--radix-accordion-content-height);
+    --radix-accordion-content-width: var(--radix-accordion-content-width);
+    
     /* Tailwind CSS Variables with Design System Colors */
     --background: 0 0% 100%; /* White background */
     --foreground: 222.2 84% 4.9%;
@@ -147,4 +151,17 @@
 .App {
   text-align: center;
   font-family: 'Roboto', sans-serif;
+}
+
+/* Accordion Fix - Force proper rendering */
+[data-radix-accordion-content] {
+  overflow: hidden !important;
+}
+
+[data-radix-accordion-content][data-state="open"] {
+  animation: accordion-down 0.2s ease-out !important;
+}
+
+[data-radix-accordion-content][data-state="closed"] {
+  animation: accordion-up 0.2s ease-out !important;
 }

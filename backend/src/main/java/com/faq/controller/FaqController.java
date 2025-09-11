@@ -2,6 +2,7 @@ package com.faq.controller;
 
 import com.faq.dto.FaqDTO;
 import com.faq.dto.FaqSummaryDTO;
+import com.faq.dto.ViewStatsResponse;
 import com.faq.service.FaqService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,23 @@ public class FaqController {
     }
     
     /**
+     * Busca estatísticas de visualizações dos FAQs com paginação
+     */
+    @GetMapping("/views")
+    public ResponseEntity<ViewStatsResponse> getViewsWithPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        ViewStatsResponse response = faqService.findMostViewedWithPagination(page, size);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Busca FAQ por ID
      */
     @GetMapping("/{id}")
     public ResponseEntity<FaqDTO> getFaqById(@PathVariable Long id) {
         Optional<FaqDTO> faq = faqService.findById(id);
-        return faq.map(ResponseEntity::ok)
-                  .orElse(ResponseEntity.notFound().build());
+        return faq.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
     
     /**
@@ -81,6 +92,16 @@ public class FaqController {
      */
     @GetMapping("/most-viewed")
     public ResponseEntity<List<FaqDTO>> getMostViewedFaqs(
+            @RequestParam(defaultValue = "10") int limit) {
+        List<FaqDTO> faqs = faqService.findMostViewed(limit);
+        return ResponseEntity.ok(faqs);
+    }
+    
+    /**
+     * Busca estatísticas de visualizações dos FAQs
+     */
+    @GetMapping("/view-stats")
+    public ResponseEntity<List<FaqDTO>> getViewStats(
             @RequestParam(defaultValue = "10") int limit) {
         List<FaqDTO> faqs = faqService.findMostViewed(limit);
         return ResponseEntity.ok(faqs);

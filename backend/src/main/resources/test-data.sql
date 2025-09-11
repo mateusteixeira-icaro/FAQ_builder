@@ -1,26 +1,71 @@
--- Test data for FAQ application
--- This file is loaded during application startup to populate the H2 database
+-- Script completo para configuração do banco de dados FAQ System
+-- Codificação: UTF-8
+-- Este script cria as tabelas e popula com dados de teste
 
--- Insert test categories (compatible with our Category entity)
-INSERT INTO categories (name, description, active, display_order, created_at, updated_at) VALUES
-('Perguntas Gerais', 'Perguntas gerais sobre nossos serviços', true, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Suporte Técnico', 'Suporte técnico e solução de problemas', true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Faturamento', 'Perguntas relacionadas a faturamento e pagamento', true, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Gerenciamento de Conta', 'Configuração e gerenciamento de conta', true, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- Limpar dados existentes (se houver)
+DELETE FROM feedbacks;
+DELETE FROM faqs;
+DELETE FROM categories;
 
--- Insert test FAQs (compatible with our Faq entity)
--- Note: category_id will be 1, 2, 3, 4 based on the order of insertion above
-INSERT INTO faqs (question, answer, category_id, view_count, is_active, priority, created_at, updated_at) VALUES
-('O que é este serviço?', 'Este é um sistema abrangente de gerenciamento de FAQ que ajuda organizações a gerenciar suas perguntas frequentes de forma eficiente.', 1, 150, true, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Como começar?', 'Para começar, simplesmente crie uma conta e siga nosso guia passo a passo de integração. Você pode acessá-lo no painel principal.', 1, 120, true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Como redefinir minha senha?', 'Para redefinir sua senha, clique no link "Esqueci a Senha" na página de login e siga as instruções enviadas para seu email.', 2, 200, true, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Por que minha aplicação não está funcionando?', 'Se sua aplicação não está funcionando, verifique sua conexão com a internet, limpe o cache do navegador e tente novamente. Se o problema persistir, entre em contato com nossa equipe de suporte.', 2, 89, true, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Como atualizar minhas informações de faturamento?', 'Você pode atualizar suas informações de faturamento indo em Configurações da Conta > Faturamento e clicando em "Atualizar Método de Pagamento".', 3, 75, true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Quais métodos de pagamento vocês aceitam?', 'Aceitamos todos os principais cartões de crédito (Visa, MasterCard, American Express), PayPal e transferências bancárias para clientes empresariais.', 3, 95, true, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Como alterar meu endereço de email?', 'Para alterar seu endereço de email, vá em Configurações da Conta > Perfil e atualize seu email. Você precisará verificar o novo endereço de email.', 4, 60, true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Posso excluir minha conta?', 'Sim, você pode excluir sua conta indo em Configurações da Conta > Privacidade e clicando em "Excluir Conta". Note que esta ação é irreversível.', 4, 45, true, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Meus dados estão seguros?', 'Sim, levamos a segurança dos dados muito a sério. Todos os dados são criptografados em trânsito e em repouso, e seguimos as melhores práticas da indústria para segurança.', 1, 180, true, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Como entrar em contato com o suporte?', 'Você pode entrar em contato com nossa equipe de suporte através da Central de Ajuda, por email em suporte@exemplo.com, ou através do chat ao vivo disponível 24/7.', 2, 110, true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- Resetar sequências
+ALTER SEQUENCE categories_id_seq RESTART WITH 1;
+ALTER SEQUENCE faqs_id_seq RESTART WITH 1;
+ALTER SEQUENCE feedbacks_id_seq RESTART WITH 1;
 
--- Commit the transaction
+-- Inserir categorias
+INSERT INTO categories (name, description, display_order, active, created_at, updated_at) VALUES 
+('Perguntas Gerais', 'Dúvidas frequentes sobre o uso básico do sistema', 1, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Suporte Técnico', 'Problemas técnicos e soluções de troubleshooting', 2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Faturamento', 'Questões relacionadas a pagamentos e faturas', 3, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Gerenciamento de Conta', 'Configurações e gerenciamento da conta do usuário', 4, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Inserir FAQs com IDs corretos das categorias (1, 2, 3, 4)
+INSERT INTO faqs (question, answer, category_id, is_active, priority, view_count, created_at, updated_at) VALUES 
+-- Perguntas Gerais (category_id = 1)
+('Como faço para criar uma conta?', 'Para criar uma conta, clique no botão "Registrar" no canto superior direito da página inicial e preencha o formulário com suas informações pessoais.', 1, true, 1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Esqueci minha senha, como posso recuperá-la?', 'Clique em "Esqueci minha senha" na página de login e siga as instruções enviadas para seu email cadastrado.', 1, true, 2, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Como posso alterar meus dados pessoais?', 'Acesse "Meu Perfil" no menu do usuário e clique em "Editar Informações" para alterar seus dados pessoais.', 1, true, 3, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Suporte Técnico (category_id = 2)
+('O sistema está lento, o que fazer?', 'Verifique sua conexão com a internet e tente limpar o cache do navegador. Se o problema persistir, entre em contato conosco.', 2, true, 1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Não consigo fazer login, o que pode ser?', 'Verifique se está usando o email e senha corretos. Certifique-se de que o Caps Lock não está ativado.', 2, true, 2, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Como entrar em contato com o suporte?', 'Você pode nos contatar através do chat online, email suporte@exemplo.com ou telefone (11) 1234-5678.', 2, true, 3, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Por que não consigo acessar certas funcionalidades?', 'Algumas funcionalidades podem estar restritas ao seu plano atual. Verifique as permissões da sua conta ou considere fazer upgrade.', 2, true, 4, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Faturamento (category_id = 3)
+('Como visualizar minha fatura?', 'Acesse a seção "Faturamento" no seu painel de controle para visualizar e baixar suas faturas.', 3, true, 1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Quais formas de pagamento são aceitas?', 'Aceitamos cartões de crédito (Visa, Mastercard, American Express), PIX e boleto bancário.', 3, true, 2, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Como alterar minha forma de pagamento?', 'Acesse "Configurações de Pagamento" no seu painel e adicione ou altere seus métodos de pagamento.', 3, true, 3, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Gerenciamento de Conta (category_id = 4)
+('Como cancelar minha assinatura?', 'Para cancelar sua assinatura, acesse "Configurações da Conta" e clique em "Cancelar Assinatura".', 4, true, 1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Posso pausar minha conta temporariamente?', 'Sim, você pode pausar sua conta por até 3 meses. Acesse "Configurações da Conta" para esta opção.', 4, true, 2, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Como alterar meu email cadastrado?', 'Acesse "Meu Perfil" no menu do usuário e clique em "Editar Informações" para alterar seu email.', 4, true, 3, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('Como ativar a autenticação de dois fatores?', 'Vá em "Segurança" nas configurações da conta e siga as instruções para ativar a autenticação de dois fatores.', 4, true, 4, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Inserir alguns feedbacks de exemplo
+INSERT INTO feedbacks (faq_id, feedback_type, user_ip, created_at) VALUES 
+(1, 'POSITIVE', '192.168.1.100', CURRENT_TIMESTAMP),
+(2, 'POSITIVE', '192.168.1.101', CURRENT_TIMESTAMP),
+(4, 'NEGATIVE', '192.168.1.102', CURRENT_TIMESTAMP),
+(8, 'POSITIVE', '192.168.1.103', CURRENT_TIMESTAMP),
+(10, 'POSITIVE', '192.168.1.104', CURRENT_TIMESTAMP);
+
+-- Confirmar transação
 COMMIT;
+
+-- Verificar dados inseridos
+SELECT 'Categorias inseridas:' as info, COUNT(*) as total FROM categories
+UNION ALL
+SELECT 'FAQs inseridas:', COUNT(*) FROM faqs
+UNION ALL
+SELECT 'Feedbacks inseridos:', COUNT(*) FROM feedbacks;
+
+-- Mostrar distribuição de FAQs por categoria
+SELECT 
+    c.name as categoria,
+    COUNT(f.id) as total_faqs
+FROM categories c 
+LEFT JOIN faqs f ON c.id = f.category_id 
+GROUP BY c.id, c.name 
+ORDER BY c.display_order;

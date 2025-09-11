@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight, faSearchPlus } from '@fortawesome/free-solid-svg-icons';
 import { Card, CardContent } from '../ui/card.tsx';
@@ -6,19 +6,29 @@ import { Button } from '../ui/button.tsx';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion.tsx';
 import { Badge } from '../ui/badge.tsx';
 import { FormattedText } from '../ui/FormattedText.tsx';
+import { FeedbackButtons } from './FeedbackButtons.tsx';
 import { Categoria } from '../../types/faq.ts';
-import { cn } from '../../lib/utils.ts';
+import { apiService } from '../../services/api.ts';
+
 
 interface CategoryCardProps {
   categoria: Categoria;
   faqs: any[]; // Using any for compatibility with converted FAQ format
   searchTerm: string;
+  onFaqUpdate?: () => void; // Callback para atualizar dados
 }
 
-export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps) {
+export function CategoryCard({ categoria, faqs, searchTerm, onFaqUpdate }: CategoryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [localFaqs, setLocalFaqs] = useState(faqs);
+  const [expandedFaqs, setExpandedFaqs] = useState<Set<number>>(new Set());
 
-  const filteredFAQs = faqs.filter(faq => {
+  // Atualizar FAQs locais quando props mudarem
+  useEffect(() => {
+    setLocalFaqs(faqs);
+  }, [faqs]);
+
+  const filteredFAQs = localFaqs.filter(faq => {
     const matchesCategory = faq.categoria === categoria.nome;
     const matchesSearch = searchTerm === '' || 
       faq.pergunta.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -28,9 +38,24 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
     return matchesCategory && matchesSearch && faq.status === 'ativo';
   });
 
+  // FAQs filtrados por categoria e termo de busca
+
+
+
   if (filteredFAQs.length === 0 && searchTerm !== '') {
     return null;
   }
+
+  const handleFaqExpand = async (faqId: number) => {
+    if (!expandedFaqs.has(faqId)) {
+      try {
+        await apiService.incrementFaqViews(faqId);
+        setExpandedFaqs(prev => new Set([...prev, faqId]));
+      } catch (error) {
+        console.error('Erro ao incrementar visualizações:', error);
+      }
+    }
+  };
 
   const highlightText = (text: string) => {
     if (!searchTerm) return text;
@@ -48,8 +73,9 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
   };
 
   return (
-    <Card className="overflow-hidden border-border/50 hover:border-primary/20 transition-all duration-300">
-      <CardContent className="p-0">
+    <div>
+      <Card className="overflow-hidden border-border/50 hover:border-primary/20 transition-all duration-300">
+        <CardContent className="p-0">
         <Button
           variant="ghost"
           className="w-full p-6 justify-between text-left hover:bg-accent/50"
@@ -76,14 +102,21 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
           </div>
         </Button>
 
-        <div className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out",
-          isExpanded ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
-        )}>
+        {isExpanded && filteredFAQs.length > 0 && (
+          <div className="overflow-hidden">
           <div className="border-t border-border/50">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion 
+              type="single" 
+              className="w-full"
+              onValueChange={(value) => {
+                if (value) {
+                  const faqId = parseInt(value);
+                  handleFaqExpand(faqId);
+                }
+              }}
+            >
               {filteredFAQs.map((faq, index) => (
-                <AccordionItem key={faq.id} value={faq.id} className="border-border/30">
+                <AccordionItem key={faq.id} value={faq.id.toString()} className="border-border/30">
                   <AccordionTrigger className="px-6 py-4 hover:bg-muted/30 text-left">
                     <div>
                       <h4 className="font-medium text-foreground">
@@ -106,10 +139,13 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
                         enableMarkdown={true}
                       />
                     </div>
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/30">
-                      <span className="text-xs text-muted-foreground">
-                        By {faq.autor} • {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('en-US') : new Date(faq.dataUpdated).toLocaleDateString('en-US')}
-                      </span>
+                    <div className="mt-4 pt-4 border-t border-border/30 space-y-3">
+                      <FeedbackButtons faqId={faq.id} />
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          By {faq.autor} • {faq.dataUpdated instanceof Date ? faq.dataUpdated.toLocaleDateString('en-US') : new Date(faq.dataUpdated).toLocaleDateString('en-US')}
+                        </span>
+                      </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -117,7 +153,9 @@ export function CategoryCard({ categoria, faqs, searchTerm }: CategoryCardProps)
             </Accordion>
           </div>
         </div>
+        )}
       </CardContent>
     </Card>
+    </div>
   );
 }

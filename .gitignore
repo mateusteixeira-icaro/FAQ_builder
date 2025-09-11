@@ -94,3 +94,9 @@ k8s/base/secrets.yaml
 
 # Podman installer
 podman-installer-*.exe
+
+# PostgreSQL installer
+postgresql-installer.exe
+
+# Node modules cache
+frontend/node_modules/.cache/

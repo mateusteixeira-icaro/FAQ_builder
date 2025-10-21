@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS faqs (
     id BIGSERIAL PRIMARY KEY,
     category_id BIGINT NOT NULL,
     question TEXT NOT NULL,
-    answer VARCHAR(3000) NOT NULL,
-    tags TEXT[], -- PostgreSQL array type
+    answer TEXT NOT NULL,
+    tags VARCHAR(255), -- PostgreSQL array type
     active BOOLEAN DEFAULT true,
     priority INTEGER DEFAULT 0,
     author VARCHAR(255) DEFAULT 'System',
@@ -34,6 +34,16 @@ CREATE TABLE IF NOT EXISTS faqs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+-- Feedbacks table
+CREATE TABLE IF NOT EXISTS feedbacks (
+    id BIGSERIAL PRIMARY KEY,
+    faq_id BIGINT NOT NULL,
+    feedback_type VARCHAR(50) NOT NULL,
+    user_ip VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (faq_id) REFERENCES faqs(id) ON DELETE CASCADE
 );
 
 -- Indexes for better performance
@@ -46,9 +56,9 @@ CREATE INDEX IF NOT EXISTS idx_faqs_view_count ON faqs(view_count);
 CREATE INDEX IF NOT EXISTS idx_faqs_created_at ON faqs(created_at);
 
 -- Full-text search indexes
-CREATE INDEX IF NOT EXISTS idx_faqs_question_search ON faqs USING gin(to_tsvector('portuguese', question));
-CREATE INDEX IF NOT EXISTS idx_faqs_answer_search ON faqs USING gin(to_tsvector('portuguese', answer));
-CREATE INDEX IF NOT EXISTS idx_categories_name_search ON categories USING gin(to_tsvector('portuguese', name));
+CREATE INDEX IF NOT EXISTS idx_faqs_question_search ON faqs USING gin(to_tsvector('english', question));
+CREATE INDEX IF NOT EXISTS idx_faqs_answer_search ON faqs USING gin(to_tsvector('english', answer));
+CREATE INDEX IF NOT EXISTS idx_categories_name_search ON categories USING gin(to_tsvector('english', name));
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

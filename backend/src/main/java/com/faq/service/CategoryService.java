@@ -1,7 +1,9 @@
 package com.faq.service;
 
 import com.faq.dto.CategoryDTO;
+import com.faq.dto.FaqSummaryDTO;
 import com.faq.model.Category;
+import com.faq.model.Faq;
 import com.faq.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -132,6 +134,16 @@ public class CategoryService {
         dto.setDisplayOrder(category.getDisplayOrder());
         dto.setCreatedAt(category.getCreatedAt());
         dto.setUpdatedAt(category.getUpdatedAt());
+        
+        // Incluir FAQs ativos se existirem
+        if (category.getFaqs() != null && !category.getFaqs().isEmpty()) {
+            List<FaqSummaryDTO> faqSummaries = category.getFaqs().stream()
+                .filter(faq -> faq.getIsActive())
+                .map(this::convertFaqToSummary)
+                .collect(Collectors.toList());
+            dto.setFaqs(faqSummaries);
+        }
+        
         return dto;
     }
     
@@ -145,4 +157,18 @@ public class CategoryService {
         category.setDisplayOrder(dto.getDisplayOrder());
         return category;
     }
+    
+    /**
+      * Converte FAQ para resumo
+      */
+     private FaqSummaryDTO convertFaqToSummary(Faq faq) {
+         FaqSummaryDTO summary = new FaqSummaryDTO();
+         summary.setId(faq.getId());
+         summary.setQuestion(faq.getQuestion());
+         summary.setViewCount(faq.getViewCount());
+         summary.setIsActive(faq.getIsActive());
+         summary.setCreatedAt(faq.getCreatedAt());
+         summary.setUpdatedAt(faq.getUpdatedAt());
+         return summary;
+     }
 }

@@ -36,7 +36,7 @@ export function useApi<T>(
       setState({ data: null, loading: false, error: errorMessage });
       
       toast({
-        title: 'Erro na API',
+        title: 'API Error',
         description: errorMessage,
         variant: 'destructive',
       });
@@ -118,8 +118,8 @@ export function useApiMutation<TData, TVariables>(
       setState({ loading: false, error: null });
       
       toast({
-        title: 'Sucesso',
-        description: 'Operação realizada com sucesso!',
+        title: 'Success',
+        description: 'Operation completed successfully!',
       });
       
       return result;
@@ -128,7 +128,7 @@ export function useApiMutation<TData, TVariables>(
       setState({ loading: false, error: errorMessage });
       
       toast({
-        title: 'Erro',
+        title: 'Error',
         description: errorMessage,
         variant: 'destructive',
       });
@@ -179,5 +179,12 @@ export function useDeleteFaq() {
 export function useUpdateFaqStatus() {
   return useApiMutation(({ id, isActive }: { id: string; isActive: boolean }) => 
     apiService.updateFaqStatus(id, isActive)
+  );
+}
+
+// Hook para incrementar visualizações
+export function useIncrementFaqViews() {
+  return useApiMutation((faqId: string) => 
+    apiService.incrementFaqViews(faqId)
   );
 }

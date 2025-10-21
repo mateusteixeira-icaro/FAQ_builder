@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Accordion FAQ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste do Accordion FAQ</h1>
+    
+    <div class="info test-result">
+        <h3>Instruções para Teste:</h3>
+        <ol>
+            <li>Clique no botão "Abrir FAQ" para carregar a página</li>
+            <li>Expanda uma categoria clicando nela</li>
+            <li>Clique em uma pergunta para expandir a resposta</li>
+            <li>Verifique se a resposta permanece visível</li>
+            <li>Clique em outra pergunta na mesma categoria</li>
+            <li>Verifique se apenas uma pergunta fica aberta por vez (comportamento esperado)</li>
+        </ol>
+    </div>
+
+    <button onclick="loadFAQ()">Abrir FAQ</button>
+    <button onclick="testAccordion()">Testar Accordion</button>
+    <button onclick="clearResults()">Limpar Resultados</button>
+    
+    <div id="results"></div>
+    
+    <iframe id="faqFrame" style="display: none;"></iframe>
+    
+    <script>
+        function loadFAQ() {
+            const frame = document.getElementById('faqFrame');
+            frame.src = 'http://localhost:3000/faq';
+            frame.style.display = 'block';
+            addResult('FAQ carregado no iframe', 'info');
+        }
+        
+        function testAccordion() {
+            addResult('Teste manual necessário: Verifique se as perguntas expandem e permanecem abertas quando clicadas.', 'info');
+            addResult('Comportamento esperado: Apenas uma pergunta deve ficar aberta por vez dentro de cada categoria.', 'info');
+            addResult('Problema corrigido: Removida a propriedade "collapsible" que causava o fechamento automático.', 'success');
+        }
+        
+        function addResult(message, type) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Adicionar resultado inicial
+        addResult('Sistema de teste do Accordion FAQ iniciado', 'info');
+        addResult('Correção aplicada: Propriedade "collapsible" removida do componente Accordion', 'success');
+    </script>
+</body>
+</html>

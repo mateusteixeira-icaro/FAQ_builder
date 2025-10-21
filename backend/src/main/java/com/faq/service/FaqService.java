@@ -2,13 +2,16 @@ package com.faq.service;
 
 import com.faq.dto.FaqDTO;
 import com.faq.dto.FaqSummaryDTO;
+import com.faq.dto.ViewStatsResponse;
 import com.faq.model.Category;
 import com.faq.model.Faq;
 import com.faq.repository.CategoryRepository;
 import com.faq.repository.FaqRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,6 +114,30 @@ public class FaqService {
                 .limit(limit)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * Busca FAQs mais visualizados com paginação (apenas FAQs com visualizações > 0)
+     */
+    @Transactional(readOnly = true)
+    public ViewStatsResponse findMostViewedWithPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("viewCount").descending().and(Sort.by("createdAt").descending()));
+        Page<Faq> faqPage = faqRepository.findByIsActiveTrueAndViewCountGreaterThanZeroOrderByViewCountDescCreatedAtDesc(pageable);
+        
+        List<FaqDTO> faqs = faqPage.getContent()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        
+        return new ViewStatsResponse(
+                faqs,
+                faqPage.getNumber(),
+                faqPage.getTotalPages(),
+                faqPage.getTotalElements(),
+                faqPage.getSize(),
+                faqPage.hasNext(),
+                faqPage.hasPrevious()
+        );
     }
     
     /**

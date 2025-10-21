@@ -1,29 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Design System Colors */
+    --ds-primary-blue: #0F276D;
+    --ds-primary-purple: #BB388C;
+    --ds-primary-light-blue: #3470d9;
+    
+    /* Radix Accordion Variables */
+    --radix-accordion-content-height: var(--radix-accordion-content-height);
+    --radix-accordion-content-width: var(--radix-accordion-content-width);
+    
+    /* Tailwind CSS Variables with Design System Colors */
+    --background: 0 0% 100%; /* White background */
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 218 85% 24%; /* #0F276D */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
+    --secondary: 320 49% 47%; /* #BB388C */
+    --secondary-foreground: 210 40% 98%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent: 218 73% 53%; /* #3470d9 */
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 218 85% 24%;
     --radius: 0.5rem;
+    
+    /* Typography Sizes */
+    --title-1: 20pt; /* 26.67px */
+    --title-2: 16pt; /* 21.33px */
+    --body: 14pt; /* 18.67px */
   }
 
   .dark {
@@ -55,9 +71,97 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Roboto', sans-serif;
+    font-size: var(--body);
+    line-height: 1.5;
   }
+}
+
+/* Typography Classes */
+.title-1 {
+  font-size: var(--title-1);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.title-2 {
+  font-size: var(--title-2);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.body-text {
+  font-size: var(--body);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Design System Button Classes */
+.btn-primary {
+  background-color: var(--ds-primary-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0a1f5a;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--ds-primary-purple);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #a02f7a;
+  transform: translateY(-1px);
+}
+
+.btn-accent {
+  background-color: var(--ds-primary-light-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-accent:hover {
+  background-color: #2563c7;
+  transform: translateY(-1px);
 }
 
 .App {
   text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Accordion Fix - Force proper rendering */
+[data-radix-accordion-content] {
+  overflow: hidden !important;
+}
+
+[data-radix-accordion-content][data-state="open"] {
+  animation: accordion-down 0.2s ease-out !important;
+}
+
+[data-radix-accordion-content][data-state="closed"] {
+  animation: accordion-up 0.2s ease-out !important;
 }

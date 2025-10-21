@@ -153,9 +153,13 @@ class ApiService {
   }
 
   async incrementFaqViews(id: string) {
-    return this.request<void>(`/faqs/${id}/view`, {
-      method: 'POST',
+    return this.request<Faq>(`/faqs/${id}/view`, {
+      method: 'GET',
     });
+  }
+
+  async getViewStats(page: number = 0, size: number = 10) {
+    return this.request(`/faqs/views?page=${page}&size=${size}`);
   }
 }
 
